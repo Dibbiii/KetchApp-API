@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 @Service
 public class UsersController {
@@ -31,4 +32,13 @@ public class UsersController {
         }
         return dtos;
     }
+
+    public UserDto getUserById(UUID uuid) throws SQLException {
+        UserEntity user = usersRepository.findById(uuid);
+        if (user != null) {
+            return new UserDto(user.getUuid(), user.getCreated_at());
+        }
+        return null;
+    }
+
 }

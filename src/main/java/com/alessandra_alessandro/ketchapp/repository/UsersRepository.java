@@ -35,5 +35,19 @@ public class UsersRepository {
         return records;
     }
 
+    public UserEntity findById(UUID uuid) throws SQLException {
+        try (Connection conn = DatabaseConnection.getConnection()) {
+            String query = "SELECT * FROM users WHERE uuid = '" + uuid + "'";
+            Statement stmt = conn.createStatement();
+            ResultSet res = stmt.executeQuery(query);
 
+            if(res.next()) {
+                return new UserEntity(
+                        UUID.fromString(res.getString("uuid")),
+                        res.getTimestamp("created_at")
+                );
+            }
+            return null;
+        }
+    }
 }
