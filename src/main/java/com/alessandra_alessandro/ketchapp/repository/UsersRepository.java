@@ -4,11 +4,7 @@ import com.alessandra_alessandro.ketchapp.models.entity.UserEntity;
 import com.alessandra_alessandro.ketchapp.utils.DatabaseConnection;
 import org.springframework.stereotype.Repository;
 
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.sql.Timestamp;
+import java.sql.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -50,8 +46,25 @@ public class UsersRepository {
             return null;
         }
     }
-    //* Create a new user
+
     //* Delete a user
     //* Update a user
     //* Find a user by UUID
+
+    public UserEntity createUser(String username) throws SQLException { //uso username perchè è un campo obbligatorio -> mi serve per creare una nnuova riga nel DB
+        try (Connection conn = DatabaseConnection.getConnection()) {
+            String query = "INSERT INTO users (username) VALUES (?) RETURNING uuid, created_at";
+            PreparedStatement stmt = conn.prepareStatement(query);
+            stmt.setString(1, username);
+
+            ResultSet res = stmt.executeQuery();
+            if (res.next()) {
+                UUID uuid = UUID.fromString(res.getString("uuid"));
+                Timestamp createdAt = res.getTimestamp("created_at");
+                return new UserEntity(uuid, createdAt);
+            }
+            return null;
+        }
+    }
+
 }

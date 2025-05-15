@@ -41,4 +41,13 @@ public class UsersController {
         return null;
     }
 
+    public UserDto createUser(String username) throws SQLException {
+        UserEntity entity = usersRepository.createUser(username);
+        if (entity != null) {
+            return new UserDto(entity.getUuid(), entity.getCreated_at());
+        }
+        return null;
+    }
+
+
 }
