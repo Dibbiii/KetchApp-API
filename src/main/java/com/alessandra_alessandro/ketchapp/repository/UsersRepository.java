@@ -50,4 +50,8 @@ public class UsersRepository {
             return null;
         }
     }
+    //* Create a new user
+    //* Delete a user
+    //* Update a user
+    //* Find a user by UUID
 }
