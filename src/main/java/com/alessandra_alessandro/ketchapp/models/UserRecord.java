@@ -3,13 +3,11 @@ package com.alessandra_alessandro.ketchapp.models;
 public class UserRecord {
     private int id;
     private String name;
-    private int age;
 
     // Costruttore
-    public UserRecord(int id, String name, int age) {
+    public UserRecord(int id, String name) {
         this.id = id;
         this.name = name;
-        this.age = age;
     }
 
     // Getter e Setter
@@ -27,13 +25,5 @@ public class UserRecord {
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    public int getAge() {
-        return age;
-    }
-
-    public void setAge(int age) {
-        this.age = age;
     }
 }

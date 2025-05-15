@@ -1,6 +1,5 @@
 package com.alessandra_alessandro.ketchapp.routes;
 
-import com.alessandra_alessandro.ketchapp.models.TestRecord;
 import com.alessandra_alessandro.ketchapp.models.UserRecord;
 import com.alessandra_alessandro.ketchapp.utils.DatabaseConnection;
 import io.swagger.v3.oas.annotations.Operation;
@@ -25,9 +24,8 @@ public class welcome {
         @ApiResponse(responseCode = "500", description = "Internal server error")
     })
     @GetMapping("/welcome")
-    public List<TestRecord> welcome() {
+    public List<UserRecord> welcome() {
         List<UserRecord> records = new ArrayList<>();
-        List<TestRecord> testRecords = new ArrayList<>();
 
         try (Connection conn = DatabaseConnection.getConnection()) {
             String query = "SELECT * FROM test";
@@ -37,13 +35,8 @@ public class welcome {
             while (res.next()) {
                 int id = res.getInt("id");
                 String name = res.getString("name");
-                //int age = res.getInt("age");
-
-                //UserRecord record = new UserRecord(id, name, age);
-                //records.add(record);
-
-                TestRecord record = new TestRecord(id, name);
-                testRecords.add(record);
+                UserRecord record = new UserRecord(id, name);
+                records.add(record);
             }
 
             res.close();
@@ -52,6 +45,6 @@ public class welcome {
             System.out.println("Connection error: " + e.getMessage());
         }
 
-        return testRecords;
+        return records;
     }
 }
