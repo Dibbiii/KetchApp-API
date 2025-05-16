@@ -1,7 +1,9 @@
 package com.alessandra_alessandro.ketchapp.repositories;
 
+import java.sql.SQLException;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 /**
  * Interfaccia generica per le operazioni CRUD di base.
@@ -34,6 +36,14 @@ public interface GenericRepository<T, ID> {
      * @return the deleted entity instance
      */
     T delete(T entity);
+
+    /**
+     * Deletes an entity from the data source based on the provided UUID.
+     *
+     * @param uuid the unique identifier of the entity to be deleted
+     * @return {@code true} if the entity was successfully deleted, {@code false} otherwise
+     */
+    boolean deleteByUUID(UUID uuid) throws SQLException;
 
     /**
      * Finds an entity by its unique identifier.

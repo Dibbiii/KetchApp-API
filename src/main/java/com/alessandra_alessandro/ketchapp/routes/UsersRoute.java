@@ -79,5 +79,27 @@ public class UsersRoute {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
+
+    @Operation(summary = "Delete a user by UUID", description = "Deletes a user record by its UUID.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully deleted user record"),
+            @ApiResponse(responseCode = "404", description = "User not found"),
+            @ApiResponse(responseCode = "500", description = "Internal server error")
+    })
+    @DeleteMapping("/delete/{uuid}")
+    public ResponseEntity<Object> deleteUser(@PathVariable("uuid") UUID uuid) {
+        try {
+            boolean deleted = usersController.deleteByUUID(uuid);
+            if (deleted) {
+                return ResponseEntity.ok().build();
+            } else {
+                return ResponseEntity.notFound().build();
+            }
+        } catch (SQLException e) {
+            e.printStackTrace(); // Log su console il messaggio di errore per la diagnosi
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Errore SQL: " + e.getMessage()); // Così capisci subito la causa lato client/debug
+        }
+    }
 }
 

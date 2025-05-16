@@ -4,6 +4,7 @@ import com.alessandra_alessandro.ketchapp.models.entity.TomatoEntity;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 public class TomatoRepository implements GenericRepository<TomatoEntity, Integer> {
 
@@ -23,6 +24,12 @@ public class TomatoRepository implements GenericRepository<TomatoEntity, Integer
     public TomatoEntity delete(TomatoEntity entity) {
         // TODO: Implement TomatoRepository.delete
         return null;
+    }
+
+    @Override
+    public boolean deleteByUUID(UUID uuid) {
+        // TODO: Implement TomatoRepository.deleteByUUID
+        return false;
     }
 
     @Override

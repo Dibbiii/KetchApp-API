@@ -4,6 +4,7 @@ import com.alessandra_alessandro.ketchapp.models.entity.ActivityEntity;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 public class ActivityRepository implements GenericRepository<ActivityEntity, Integer> {
 
@@ -23,6 +24,12 @@ public class ActivityRepository implements GenericRepository<ActivityEntity, Int
     public ActivityEntity delete(ActivityEntity entity) {
         // TODO: Implement ActivityRepository.delete
         return null;
+    }
+
+    @Override
+    public boolean deleteByUUID(UUID uuid) {
+        // TODO: Implement ActivityRepository.deleteByUUID
+        return false;
     }
 
     @Override

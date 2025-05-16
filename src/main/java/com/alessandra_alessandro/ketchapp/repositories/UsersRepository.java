@@ -86,6 +86,19 @@ public class UsersRepository implements GenericRepository<UserEntity, UUID>{
     }
 
     @Override
+    public boolean deleteByUUID(UUID uuid) throws SQLException {
+        try (Connection conn = DatabaseConnection.getConnection()) {
+            String query = "DELETE FROM users WHERE uuid = ? RETURNING uuid";
+            try (PreparedStatement stmt = conn.prepareStatement(query)) {
+                stmt.setObject(1, uuid);
+                try (ResultSet res = stmt.executeQuery()) {
+                    return res.next();
+                }
+            }
+        }
+    }
+
+    @Override
     public Optional<UserEntity> selectById(UUID uuid) {
         // TODO: Implement UserRepository.selectById
         return Optional.empty();

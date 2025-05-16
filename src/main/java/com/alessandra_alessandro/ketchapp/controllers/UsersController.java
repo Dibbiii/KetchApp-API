@@ -50,4 +50,11 @@ public class UsersController {
     }
 
 
+    public boolean deleteByUUID(UUID uuid) throws SQLException {
+        try {
+            return usersRepository.deleteByUUID(uuid);
+        } catch (SQLException e) {
+            throw new SQLException("Error deleting user with UUID: " + uuid, e);
+        }
+    }
 }
