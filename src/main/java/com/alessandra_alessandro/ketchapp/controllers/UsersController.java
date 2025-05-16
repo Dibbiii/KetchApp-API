@@ -62,7 +62,7 @@ public class UsersController {
                 .collect(Collectors.toList());
     }
 
-    public UserDto getUserById(UUID uuid) {
+    public UserDto getUserByUUID(UUID uuid) {
         if (uuid == null) {
             throw new IllegalArgumentException("UUID cannot be null");
         }

@@ -48,9 +48,9 @@ public class UsersRoute {
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
     @GetMapping("/{uuid}")
-    public ResponseEntity<UserDto> getUserById(@PathVariable("uuid") UUID uuid) {
+    public ResponseEntity<UserDto> getUserByUUID(@PathVariable("uuid") UUID uuid) {
         try {
-            UserDto user = usersController.getUserById(uuid);
+            UserDto user = usersController.getUserByUUID(uuid);
             if (user != null) {
                 return ResponseEntity.ok(user);
             } else {
