@@ -1,22 +1,38 @@
 package com.alessandra_alessandro.ketchapp.models.entity;
 
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
+import jakarta.persistence.Id;
+import jakarta.persistence.Column;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.NoArgsConstructor;
+import lombok.AllArgsConstructor;
+import org.apache.catalina.User;
 
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+@Entity
+@Table(name = "users")
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class UserEntity {
-    @Setter
-    @Getter
-    private UUID uuid;
-    @Setter
-    @Getter
-    private Timestamp created_at;
 
-    public UserEntity(UUID uuid, Timestamp created_at) {
-        this.uuid = uuid;
-        this.created_at = created_at;
+    @Id
+    private UUID uuid;
+
+    private String username;
+
+    @Column(name = "created_at")
+    private Timestamp createdAt;
+
+    public UserEntity(String username) {
+        this.uuid = UUID.randomUUID();
+        this.username = username;
+        this.createdAt = Timestamp.valueOf(LocalDateTime.now());
     }
 }

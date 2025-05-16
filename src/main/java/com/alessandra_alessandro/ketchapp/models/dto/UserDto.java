@@ -13,10 +13,14 @@ public class UserDto {
     private UUID uuid;
     @Getter
     @Setter
-    private Timestamp created_at;
+    private String username;
+    @Getter
+    @Setter
+    private Timestamp createdAt;
 
-    public UserDto(UUID uuid, Timestamp createdAt) {
+    public UserDto(UUID uuid, String username, Timestamp createdAt) {
         this.uuid = uuid;
-        this.created_at = createdAt;
+        this.username = username;
+        this.createdAt = createdAt;
     }
 }

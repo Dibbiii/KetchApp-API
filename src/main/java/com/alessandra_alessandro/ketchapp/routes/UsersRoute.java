@@ -3,6 +3,8 @@ package com.alessandra_alessandro.ketchapp.routes;
 import com.alessandra_alessandro.ketchapp.controllers.UsersController;
 import com.alessandra_alessandro.ketchapp.models.dto.UserDto;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,7 +12,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.sql.SQLException;
 import java.util.List;
 import java.util.UUID;
 
@@ -35,7 +36,7 @@ public class UsersRoute {
         try {
             List<UserDto> users = usersController.getAllUsers();
             return ResponseEntity.ok(users);
-        } catch (SQLException e) {
+        } catch (Exception e) {
             return ResponseEntity.internalServerError().build();
         }
     }
@@ -55,27 +56,27 @@ public class UsersRoute {
             } else {
                 return ResponseEntity.notFound().build();
             }
-        } catch (SQLException e) {
+        } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
 
-    @Operation(summary = "Create a new user", description = "Creates a new user record in the database.")
+    @Operation(summary = "Create a new user", description = "Creates a new user record in the database. User data should be provided in the request body.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "201", description = "Successfully created user record"),
-            @ApiResponse(responseCode = "400", description = "Bad request"),
+            @ApiResponse(responseCode = "201", description = "Successfully created user record",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = UserDto.class))),
+            @ApiResponse(responseCode = "400", description = "Bad request (e.g., invalid data)"),
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
-    @PostMapping("/create/{username}")
-    public ResponseEntity<UserDto> createUser(@PathVariable("username") String username) {
+    @PostMapping("/create")
+    public ResponseEntity<UserDto> createUser(@RequestBody UserDto userDtoToCreate) {
         try {
-            UserDto user = usersController.createUser(username);
-            if (user != null) {
-                return ResponseEntity.status(HttpStatus.CREATED).body(user);
-            } else {
-                return ResponseEntity.badRequest().build();
-            }
-        } catch (SQLException e) {
+            UserDto createdUser = usersController.createUser(userDtoToCreate);
+            return ResponseEntity.status(HttpStatus.CREATED).body(createdUser);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().build();
+        } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
@@ -89,17 +90,14 @@ public class UsersRoute {
     @DeleteMapping("/delete/{uuid}")
     public ResponseEntity<Object> deleteUser(@PathVariable("uuid") UUID uuid) {
         try {
-            boolean deleted = usersController.deleteByUUID(uuid);
+            boolean deleted = usersController.deleteUserByUUID(uuid);
             if (deleted) {
                 return ResponseEntity.ok().build();
             } else {
                 return ResponseEntity.notFound().build();
             }
-        } catch (SQLException e) {
-            e.printStackTrace(); // Log su console il messaggio di errore per la diagnosi
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("Errore SQL: " + e.getMessage()); // Così capisci subito la causa lato client/debug
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
 }
-
