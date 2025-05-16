@@ -26,7 +26,7 @@ public class AppointmentEntity {
     private UUID userUUID;
 
     @Column(name = "created_at")
-    private Timestamp createAt;
+    private Timestamp createdAt;
 
     private String name;
 
