@@ -25,6 +25,9 @@ public class AchievementEntity {
     @Column(name = "user_uuid")
     private UUID userUUID;
 
+    @Column(name = "achievement_id")
+    private Integer achievementId;
+
     @Column(name = "created_at")
     private Timestamp createdAt;
 }
