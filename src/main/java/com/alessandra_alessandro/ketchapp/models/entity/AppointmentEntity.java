@@ -1,28 +1,38 @@
 package com.alessandra_alessandro.ketchapp.models.entity;
 
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.sql.Timestamp;
 import java.util.UUID;
 
+@Entity
+@Table(name = "appointments")
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class AppointmentEntity {
-    @Getter
-    @Setter
-    private Integer id;
-    @Getter
-    @Setter
-    private UUID user_uuid;
-    @Getter
-    @Setter
-    private Timestamp created_at;
-    @Getter
-    @Setter
+    @Id
+    private String id;
+
+    @Column(name = "user_uuid")
+    private UUID userUUID;
+
+    @Column(name = "created_at")
+    private Timestamp createAt;
+
     private String name;
-    @Getter
-    @Setter
-    private Timestamp start_at;
-    @Getter
-    @Setter
-    private Timestamp end_at;
+
+    @Column(name = "start_at")
+    private Timestamp startAt;
+
+    @Column(name = "end_at")
+    private Timestamp endAt;
 }

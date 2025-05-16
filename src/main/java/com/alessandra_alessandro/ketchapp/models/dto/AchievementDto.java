@@ -6,18 +6,16 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.sql.Timestamp;
-import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserDto {
+public class AchievementDto {
+    private Integer id;
 
-    private UUID uuid;
-
-    private String username;
+    private UUID userUUID;
 
     private Timestamp createdAt;
 }

@@ -2,26 +2,40 @@ package com.alessandra_alessandro.ketchapp.models.entity;
 
 import com.alessandra_alessandro.ketchapp.models.enums.ActivityAction;
 import com.alessandra_alessandro.ketchapp.models.enums.ActivityType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.sql.Timestamp;
 import java.util.UUID;
 
+@Entity
+@Table(name = "activities")
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class ActivityEntity {
-    @Getter
-    @Setter
-    private UUID user_uuid;
-    @Getter
-    @Setter
-    private Integer tomato_id;
-    @Getter
-    @Setter
-    private Timestamp created_at;
-    @Getter
-    @Setter
+    @Id
+    private Integer id;
+
+    @Column(name = "user_uuid")
+    private UUID userUUID;
+
+    @Column(name = "tomato_id")
+    private Integer tomatoId;
+
+    @Column(name = "type")
     private ActivityType type;
-    @Getter
-    @Setter
+
+    @Column(name = "action")
     private ActivityAction action;
+
+    @Column(name = "created_at")
+    private Timestamp createdAt;
 }
