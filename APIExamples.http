@@ -1,11 +1,24 @@
-### GET request to example server
-GET https://examples.http-client.intellij.net/get
-    ?generated-in=IntelliJ IDEA
+### Get all users
+GET http://localhost:8080/api/users
 
-###
+### Create a new user
 POST http://localhost:8080/api/users/create
 Content-Type: application/json
 
 {
   "username": "dibbiiii"
+}
+
+### Get all activities
+GET http://localhost:8080/api/activities
+
+### Create a new activity
+POST http://localhost:8080/api/activities/create
+Content-Type: application/json
+
+{
+  "name": "dibbiiii",
+  "description": "dibbiiii",
+  "date": "2023-10-01T00:00:00Z",
+  "location": "dibbiiii"
 }

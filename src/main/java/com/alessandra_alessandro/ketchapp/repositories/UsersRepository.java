@@ -9,9 +9,6 @@ import java.util.UUID;
 
 @Repository
 public interface UsersRepository extends JpaRepository<UserEntity, UUID> {
-
-    // Spring Data JPA creerà automaticamente l'implementazione per questo metodo
-    // basandosi sul nome. Cercherà un UserEntity per il suo campo 'username'.
     Optional<UserEntity> findByUsername(String username);
 
     // Non è necessario dichiarare metodi come save, findById, findAll, deleteById, etc.,
