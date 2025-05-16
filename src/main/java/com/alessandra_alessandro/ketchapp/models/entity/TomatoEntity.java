@@ -1,9 +1,6 @@
 package com.alessandra_alessandro.ketchapp.models.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -20,16 +17,14 @@ import java.util.UUID;
 @AllArgsConstructor
 public class TomatoEntity {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
     @Column(name = "user_uuid")
-    private UUID usreUUID;
+    private UUID userUUID;
 
     @Column(name = "group_id")
     private Integer groupId;
-
-    @Column(name = "created_at")
-    private Timestamp createdAt;
 
     @Column(name = "start_at")
     private Timestamp startAt;
@@ -44,4 +39,17 @@ public class TomatoEntity {
     private Integer nextTomatoId;
 
     private String subject;
+
+    @Column(name = "created_at")
+    private Timestamp createdAt = new Timestamp(System.currentTimeMillis());
+
+    public TomatoEntity(UUID userUUID, Integer groupId, Timestamp startAt, Timestamp endAt, Timestamp pauseAt, Integer nextTomatoId, String subject) {
+        this.userUUID = userUUID;
+        this.groupId = groupId;
+        this.startAt = startAt;
+        this.endAt = endAt;
+        this.pauseAt = pauseAt;
+        this.nextTomatoId = nextTomatoId;
+        this.subject = subject;
+    }
 }

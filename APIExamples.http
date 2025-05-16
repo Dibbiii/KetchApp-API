@@ -32,3 +32,5 @@ GET http://localhost:8080/api/achievements
 
 ### Get all achievements for a user
 GET http://localhost:8080/api/achievements/d34096fe-420f-4d71-9b17-b5ec84490e20
+
+

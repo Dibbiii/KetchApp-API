@@ -39,31 +39,21 @@ public class ActivitiesControllers {
             return null;
         }
         return new ActivityEntity(
-                dto.getId(),
                 dto.getUserUUID(),
                 dto.getTomatoId(),
                 dto.getType(),
-                dto.getAction(),
-                dto.getCreatedAt()
+                dto.getAction()
         );
     }
 
-    public List<ActivityDto> getAllActivities() {
+    public List<ActivityDto> getActivities() {
         List<ActivityEntity> activities = activitiesRepository.findAll();
         return activities.stream()
                 .map(this::convertEntityToDto)
                 .collect(Collectors.toList());
     }
 
-    public ActivityDto getActivityByUserUUID(UUID uuid) {
-        if (uuid == null) {
-            throw new IllegalArgumentException("UUID cannot be null");
-        }
-        Optional<ActivityEntity> activity = activitiesRepository.findByUserUUID(uuid);
-        return convertEntityToDto(activity.orElse(null));
-    }
-
-    public ActivityDto getActivityById(Integer id) {
+    public ActivityDto getActivity(Integer id) {
         if (id == null) {
             throw new IllegalArgumentException("ID cannot be null");
         }
@@ -71,30 +61,28 @@ public class ActivitiesControllers {
         return convertEntityToDto(activity.orElse(null));
     }
 
-    public List<ActivityDto> getActivitiesByTomatoId(Integer tomatoId) {
-        if (tomatoId == null) {
-            throw new IllegalArgumentException("Tomato ID cannot be null");
-        }
-        Optional<ActivityEntity> activities = activitiesRepository.findByTomatoId(tomatoId);
-        return activities.stream()
-                .map(this::convertEntityToDto)
-                .collect(Collectors.toList());
-    }
-
     public ActivityDto createActivity(ActivityDto activityDto) {
         if (activityDto == null || activityDto.getUserUUID() == null) {
             throw new IllegalArgumentException("Activity data or user UUID cannot be null");
         }
-        ActivityEntity entityToSave = convertDtoToEntity(activityDto);
-        ActivityEntity savedEntity = activitiesRepository.save(entityToSave);
-        return convertEntityToDto(savedEntity);
+        ActivityEntity activityEntity = convertDtoToEntity(activityDto);
+        if (activityEntity == null) {
+            throw new IllegalArgumentException("ActivityEntity cannot be null");
+        }
+        activityEntity = activitiesRepository.save(activityEntity);
+        return convertEntityToDto(activityEntity);
     }
 
-    public void deleteActivityById(Integer id) {
+    public ActivityDto deleteActivity(Integer id) {
         if (id == null) {
             throw new IllegalArgumentException("ID cannot be null");
         }
-        activitiesRepository.deleteById(id);
+        Optional<ActivityEntity> activityOptional = activitiesRepository.findById(id);
+        if (activityOptional.isPresent()) {
+            activitiesRepository.delete(activityOptional.get());
+            return convertEntityToDto(activityOptional.get());
+        } else {
+            throw new IllegalArgumentException("Activity with ID '" + id + "' not found.");
+        }
     }
-
 }

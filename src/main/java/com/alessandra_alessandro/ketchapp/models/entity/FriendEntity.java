@@ -1,13 +1,12 @@
 package com.alessandra_alessandro.ketchapp.models.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+
+import java.sql.Timestamp;
 
 @Entity
 @Table(name = "friends")
@@ -17,6 +16,7 @@ import lombok.Setter;
 @AllArgsConstructor
 public class FriendEntity {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private String id;
 
     @Column(name = "user_uuid")
@@ -24,4 +24,12 @@ public class FriendEntity {
 
     @Column(name = "friend_uuid")
     private String friendUUID;
+
+    @Column(name = "created_at")
+    private Timestamp createdAt = new Timestamp(System.currentTimeMillis());
+
+    public FriendEntity(String userUUID, String friendUUID) {
+        this.userUUID = userUUID;
+        this.friendUUID = friendUUID;
+    }
 }

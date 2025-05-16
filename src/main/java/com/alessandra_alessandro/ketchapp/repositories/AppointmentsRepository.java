@@ -7,10 +7,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-public interface AppointmentsRepository extends JpaRepository<AppointmentEntity, UUID> {
+public interface AppointmentsRepository extends JpaRepository<AppointmentEntity, Integer> {
     Optional<AppointmentEntity> findByName(String name);
-
-    List<AppointmentEntity> findByUserUUID(UUID userUUID);
-
-    void deleteById(UUID id);
 }

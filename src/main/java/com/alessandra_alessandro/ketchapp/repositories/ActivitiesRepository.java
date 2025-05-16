@@ -7,8 +7,6 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface ActivitiesRepository extends JpaRepository<ActivityEntity, Integer> {
-    Optional<ActivityEntity> findByUserUUID(UUID uuid);
-
     Optional<ActivityEntity> findByTomatoId(Integer tomatoId);
     // TODO: See if we need to add more methods here ActivitiesRepository
 }

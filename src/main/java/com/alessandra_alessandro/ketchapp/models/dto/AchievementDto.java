@@ -13,6 +13,8 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 public class AchievementDto {
+
+
     private Integer id;
 
     private UUID userUUID;

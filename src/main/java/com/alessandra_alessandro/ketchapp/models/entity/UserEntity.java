@@ -23,16 +23,21 @@ import java.util.UUID;
 public class UserEntity {
 
     @Id
-    private UUID uuid;
+    private UUID uuid = UUID.randomUUID();
 
     private String username;
 
-    @Column(name = "created_at")
-    private Timestamp createdAt;
+    private String email;
 
-    public UserEntity(String username) {
-        this.uuid = UUID.randomUUID();
+    @Column(name = "firebase_uid")
+    private String firebaseUid;
+
+    @Column(name = "created_at")
+    private Timestamp createdAt = new Timestamp(System.currentTimeMillis());
+
+    public UserEntity(String username, String email, String firebaseUid) {
+        this.email = email;
+        this.firebaseUid = firebaseUid;
         this.username = username;
-        this.createdAt = Timestamp.valueOf(LocalDateTime.now());
     }
 }

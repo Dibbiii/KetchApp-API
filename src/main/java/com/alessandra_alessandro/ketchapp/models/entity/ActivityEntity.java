@@ -19,6 +19,7 @@ import java.util.UUID;
 @AllArgsConstructor
 public class ActivityEntity {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
     @Column(name = "user_uuid")
@@ -36,5 +37,12 @@ public class ActivityEntity {
     private ActivityAction action;
 
     @Column(name = "created_at")
-    private Timestamp createdAt;
+    private Timestamp createdAt = new Timestamp(System.currentTimeMillis());
+
+    public ActivityEntity(UUID uuid, Integer tomatoId, ActivityType type, ActivityAction action) {
+        this.userUUID = uuid;
+        this.tomatoId = tomatoId;
+        this.type = type;
+        this.action = action;
+    }
 }

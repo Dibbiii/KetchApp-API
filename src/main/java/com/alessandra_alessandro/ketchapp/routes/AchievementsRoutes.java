@@ -22,7 +22,7 @@ import static org.springframework.data.jpa.domain.AbstractPersistable_.id;
 @RequestMapping("/api/achievements")
 public class AchievementsRoutes {
 
-    private  final AchievementsControllers achievementsController;
+    private final AchievementsControllers achievementsController;
 
     @Autowired
     public AchievementsRoutes(AchievementsControllers achievementsController) {
@@ -35,9 +35,9 @@ public class AchievementsRoutes {
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
     @GetMapping
-    public ResponseEntity<List<AchievementDto>> getAllAchievements() {
+    public ResponseEntity<List<AchievementDto>> getAchievements() {
         try {
-            List<AchievementDto> achievements = achievementsController.getAllAchievements();
+            List<AchievementDto> achievements = achievementsController.getAchievements();
             return ResponseEntity.ok(achievements);
         } catch (Exception e) {
             return ResponseEntity.internalServerError().build();
@@ -50,10 +50,10 @@ public class AchievementsRoutes {
             @ApiResponse(responseCode = "404", description = "Achievement not found"),
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
-    @GetMapping("/{uuid}")
-    public ResponseEntity<AchievementDto> getAchievementByUserUUID(@PathVariable UUID uuid) {
+    @GetMapping("/{id}")
+    public ResponseEntity<AchievementDto> getAchievement(@PathVariable Integer id) {
         try {
-            AchievementDto achievement = achievementsController.getAchievementByUserUUID(uuid);
+            AchievementDto achievement = achievementsController.getAchievement(id);
             if (achievement != null) {
                 return ResponseEntity.ok(achievement);
             } else {
@@ -64,17 +64,14 @@ public class AchievementsRoutes {
         }
     }
 
-    // TODO: See if we need to getAchievementById
-
-    @Operation(summary = "Create a new achievement", description = "Creates a new achievement record.")
+    @Operation(summary = "Create a new achievement", description = "Creates a new achievement in the database.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "201", description = "Successfully created achievement record",
+            @ApiResponse(responseCode = "201", description = "Successfully created achievement",
                     content = @Content(mediaType = "application/json",
                             schema = @Schema(implementation = AchievementDto.class))),
             @ApiResponse(responseCode = "400", description = "Invalid input data"),
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
-    @PostMapping("/create")
     public ResponseEntity<AchievementDto> createAchievement(@RequestBody AchievementDto achievementDto) {
         try {
             AchievementDto createdAchievement = achievementsController.createAchievement(achievementDto);
@@ -86,17 +83,23 @@ public class AchievementsRoutes {
         }
     }
 
-    @Operation(summary = "Delete an achievement by ID", description = "Deletes an achievement record by its ID.")
+    @Operation(summary = "Delete an achievement", description = "Deletes an achievement by its ID.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Successfully deleted achievement"),
+            @ApiResponse(responseCode = "200", description = "Successfully deleted achievement",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = AchievementDto.class))),
             @ApiResponse(responseCode = "404", description = "Achievement not found"),
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteAchievementById(@PathVariable Integer id) {
+    public ResponseEntity<AchievementDto> deleteAchievement(@PathVariable Integer id) {
         try {
-            achievementsController.deleteAchievementById(id);
-            return ResponseEntity.ok().build();
+            AchievementDto deletedAchievement = achievementsController.deleteAchievement(id);
+            if (deletedAchievement != null) {
+                return ResponseEntity.ok(deletedAchievement);
+            } else {
+                return ResponseEntity.notFound().build();
+            }
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().build();
         } catch (Exception e) {

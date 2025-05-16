@@ -6,22 +6,18 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.sql.Timestamp;
-import java.time.LocalDateTime;
-import java.util.UUID;
 
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserDto {
+public class FriendDto {
 
-    private UUID uuid;
+    private String id;
 
-    private String username;
+    private String userUUID;
 
-    private String email;
-
-    private String firebaseUid;
+    private String friendUUID;
 
     private Timestamp createdAt;
 }

@@ -29,6 +29,8 @@ public class UsersControllers {
         return new UserDto(
                 entity.getUuid(),
                 entity.getUsername(),
+                entity.getEmail(),
+                entity.getFirebaseUid(),
                 entity.getCreatedAt()
         );
     }
@@ -37,48 +39,68 @@ public class UsersControllers {
         if (dto == null) {
             return null;
         }
-        return new UserEntity(dto.getUsername());
+        return new UserEntity(
+                dto.getEmail(),
+                dto.getFirebaseUid(),
+                dto.getUsername());
     }
 
     @Transactional
     public UserDto createUser(UserDto userDto) {
-        if (userDto == null || userDto.getUsername() == null || userDto.getUsername().trim().isEmpty()) {
-            throw new IllegalArgumentException("User data or username cannot be null or empty");
+        if (userDto == null) {
+            throw new IllegalArgumentException("UserDto cannot be null");
         }
-        Optional<UserEntity> existingUser = usersRepository.findByUsername(userDto.getUsername());
-        if (existingUser.isPresent()) {
-            throw new IllegalArgumentException("Username '" + userDto.getUsername() + "' already exists.");
+        UserEntity userEntity = convertDtoToEntity(userDto);
+        if (userEntity == null) {
+            throw new IllegalArgumentException("UserEntity cannot be null");
         }
-
-        UserEntity entityToSave = convertDtoToEntity(userDto);
-        UserEntity savedEntity = usersRepository.save(entityToSave);
-        return convertEntityToDto(savedEntity);
+        userEntity = usersRepository.save(userEntity);
+        return convertEntityToDto(userEntity);
     }
 
-    public List<UserDto> getAllUsers() {
+    @Transactional
+    public UserDto deleteUser(UUID uuid) {
+        if (uuid == null) {
+            throw new IllegalArgumentException("UUID cannot be null");
+        }
+        Optional<UserEntity> entityOptional = usersRepository.findById(uuid);
+        if (entityOptional.isPresent()) {
+            usersRepository.delete(entityOptional.get());
+            return convertEntityToDto(entityOptional.get());
+        } else {
+            throw new IllegalArgumentException("User with UUID '" + uuid + "' not found.");
+        }
+    }
+
+        public List<UserDto> getUsers() {
         List<UserEntity> entities = usersRepository.findAll();
         return entities.stream()
                 .map(this::convertEntityToDto)
                 .collect(Collectors.toList());
     }
 
-    public UserDto getUserByUUID(UUID uuid) {
-        if (uuid == null) {
+    public UserDto getUser(UUID id) {
+        if (id == null) {
             throw new IllegalArgumentException("UUID cannot be null");
         }
-        Optional<UserEntity> entityOptional = usersRepository.findById(uuid);
-        return entityOptional.map(this::convertEntityToDto).orElse(null);
+        Optional<UserEntity> entityOptional = usersRepository.findById(id);
+        if (entityOptional.isPresent()) {
+            return convertEntityToDto(entityOptional.get());
+        } else {
+            throw new IllegalArgumentException("User with UUID '" + id + "' not found.");
+        }
     }
 
-    @Transactional
-    public boolean deleteUserByUUID(UUID uuid) {
-        if (uuid == null) {
-            throw new IllegalArgumentException("UUID cannot be null for deletion");
-        }
-        if (usersRepository.existsById(uuid)) {
-            usersRepository.deleteById(uuid);
-            return true;
-        }
-        return false;
-    }
+//    public UserDto searchUser(String username) {
+//        if (username == null || username.isEmpty()) {
+//            throw new IllegalArgumentException("Username cannot be null or empty");
+//        }
+//        List<UserEntity> entities = usersRepository.findByUsername(username);
+//        if (entities.isEmpty()) {
+//            throw new IllegalArgumentException("User with username '" + username + "' not found.");
+//        }
+//        return convertEntityToDto(entities.get(0));
+//    }
+
+
 }

@@ -1,7 +1,5 @@
 package com.alessandra_alessandro.ketchapp.models.dto;
 
-import com.alessandra_alessandro.ketchapp.models.enums.ActivityAction;
-import com.alessandra_alessandro.ketchapp.models.enums.ActivityType;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -14,17 +12,23 @@ import java.util.UUID;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class ActivityDto {
+public class TomatoDto {
 
     private Integer id;
 
     private UUID userUUID;
 
-    private Integer tomatoId;
+    private Integer groupId;
 
-    private ActivityType type;
+    private Timestamp startAt;
 
-    private ActivityAction action;
+    private Timestamp endAt;
+
+    private Timestamp pauseAt;
+
+    private Integer nextTomatoId;
+
+    private String subject;
 
     private Timestamp createdAt;
 }

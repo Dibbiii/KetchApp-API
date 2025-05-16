@@ -39,42 +39,47 @@ public class AchievementsControllers {
         return new AchievementEntity(dto.getUserUUID(), dto.getAchievementNumber());
     }
 
-    public List<AchievementDto> getAllAchievements() {
+    public List<AchievementDto> getAchievements() {
         List<AchievementEntity> entities = achievementsRepository.findAll();
         return entities.stream()
                 .map(this::convertEntityToDto)
                 .collect(Collectors.toList());
     }
 
-    public AchievementDto getAchievementByUserUUID(UUID uuid) {
-        if(uuid == null) {
-            throw new IllegalArgumentException("UUID cannot be null");
-        }
-        Optional<AchievementEntity> entityOptional = achievementsRepository.findByUserUUID(uuid);
-        return entityOptional.map(this::convertEntityToDto).orElse(null);
-    }
-
-    public AchievementDto getAchievementById(Integer id) {
+    public AchievementDto getAchievement(Integer id) {
         if (id == null) {
             throw new IllegalArgumentException("ID cannot be null");
         }
-        Optional<AchievementEntity> entityOptional = achievementsRepository.findById(id);
-        return entityOptional.map(this::convertEntityToDto).orElse(null);
+        Optional<AchievementEntity> achievement = achievementsRepository.findById(id);
+        if (achievement.isPresent()) {
+            return convertEntityToDto(achievement.get());
+        } else {
+            throw new IllegalArgumentException("Achievement not found with ID: " + id);
+        }
     }
 
     public AchievementDto createAchievement(AchievementDto achievementDto) {
         if (achievementDto == null || achievementDto.getUserUUID() == null) {
             throw new IllegalArgumentException("Achievement data or user UUID cannot be null");
         }
-        AchievementEntity entityToSave = convertDtoToEntity(achievementDto);
-        AchievementEntity savedEntity = achievementsRepository.save(entityToSave);
-        return convertEntityToDto(savedEntity);
+        AchievementEntity achievementEntity = convertDtoToEntity(achievementDto);
+        if (achievementEntity == null) {
+            throw new IllegalArgumentException("AchievementEntity cannot be null");
+        }
+        achievementEntity = achievementsRepository.save(achievementEntity);
+        return convertEntityToDto(achievementEntity);
     }
 
-    public void deleteAchievementById(Integer id) {
+    public AchievementDto deleteAchievement(Integer id) {
         if (id == null) {
             throw new IllegalArgumentException("ID cannot be null");
         }
-        achievementsRepository.deleteById(id);
+        Optional<AchievementEntity> achievementOptional = achievementsRepository.findById(id);
+        if (achievementOptional.isPresent()) {
+            achievementsRepository.delete(achievementOptional.get());
+            return convertEntityToDto(achievementOptional.get());
+        } else {
+            throw new IllegalArgumentException("Achievement with ID '" + id + "' not found.");
+        }
     }
 }

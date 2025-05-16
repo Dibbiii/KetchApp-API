@@ -1,9 +1,6 @@
 package com.alessandra_alessandro.ketchapp.models.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -20,13 +17,11 @@ import java.util.UUID;
 @AllArgsConstructor
 public class AppointmentEntity {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private String id;
 
     @Column(name = "user_uuid")
     private UUID userUUID;
-
-    @Column(name = "created_at")
-    private Timestamp createdAt;
 
     private String name;
 
@@ -35,4 +30,14 @@ public class AppointmentEntity {
 
     @Column(name = "end_at")
     private Timestamp endAt;
+
+    @Column(name = "created_at")
+    private Timestamp createdAt = new Timestamp(System.currentTimeMillis());
+
+    public AppointmentEntity(UUID userUUID, String name, Timestamp startAt, Timestamp endAt) {
+        this.userUUID = userUUID;
+        this.name = name;
+        this.startAt = startAt;
+        this.endAt = endAt;
+    }
 }
