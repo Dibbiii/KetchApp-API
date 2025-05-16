@@ -1,6 +1,6 @@
 package com.alessandra_alessandro.ketchapp.routes;
 
-import com.alessandra_alessandro.ketchapp.controllers.UsersController;
+import com.alessandra_alessandro.ketchapp.controllers.UsersControllers;
 import com.alessandra_alessandro.ketchapp.models.dto.UserDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -17,12 +17,12 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/users")
-public class UsersRoute {
+public class UsersRoutes {
 
-    private final UsersController usersController;
+    private final UsersControllers usersController;
 
     @Autowired
-    public UsersRoute(UsersController usersController) {
+    public UsersRoutes(UsersControllers usersController) {
         this.usersController = usersController;
     }
 

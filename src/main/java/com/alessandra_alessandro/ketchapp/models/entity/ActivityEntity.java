@@ -2,10 +2,7 @@ package com.alessandra_alessandro.ketchapp.models.entity;
 
 import com.alessandra_alessandro.ketchapp.models.enums.ActivityAction;
 import com.alessandra_alessandro.ketchapp.models.enums.ActivityType;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -30,9 +27,11 @@ public class ActivityEntity {
     @Column(name = "tomato_id")
     private Integer tomatoId;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "type")
     private ActivityType type;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "action")
     private ActivityAction action;
 

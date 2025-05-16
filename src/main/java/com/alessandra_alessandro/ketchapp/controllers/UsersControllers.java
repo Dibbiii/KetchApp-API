@@ -13,12 +13,12 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
-public class UsersController {
+public class UsersControllers {
 
     private final UsersRepository usersRepository;
 
     @Autowired
-    public UsersController(UsersRepository usersRepository) {
+    public UsersControllers(UsersRepository usersRepository) {
         this.usersRepository = usersRepository;
     }
 

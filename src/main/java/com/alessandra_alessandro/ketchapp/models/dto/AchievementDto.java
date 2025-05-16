@@ -17,5 +17,7 @@ public class AchievementDto {
 
     private UUID userUUID;
 
+    private Integer AchievementNumber;
+
     private Timestamp createdAt;
 }

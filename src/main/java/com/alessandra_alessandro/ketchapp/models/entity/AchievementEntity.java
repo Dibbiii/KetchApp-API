@@ -25,9 +25,15 @@ public class AchievementEntity {
     @Column(name = "user_uuid")
     private UUID userUUID;
 
-    @Column(name = "achievement_id")
-    private Integer achievementId;
+    @Column(name = "achievement_number")
+    private Integer achievementNumber;
 
     @Column(name = "created_at")
     private Timestamp createdAt;
+
+    public AchievementEntity(UUID userUUID, Integer achievementNumber) {
+        this.userUUID = userUUID;
+        this.achievementNumber = achievementNumber;
+        this.createdAt = new Timestamp(System.currentTimeMillis());
+    }
 }
