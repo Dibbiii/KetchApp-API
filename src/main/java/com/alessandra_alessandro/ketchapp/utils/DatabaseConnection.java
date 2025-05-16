@@ -6,11 +6,11 @@ import java.sql.SQLException;
 
 public class DatabaseConnection {
 
-    private static final String HOST = "aws-0-eu-central-1.pooler.supabase.com";
-    private static final String PORT = "6543";
-    private static final String DATABASE = "postgres";
-    private static final String USER = "postgres.rxdfayaqsbtfmhfmaids";
-    private static final String PASSWORD = "Gqi5HDeui3!";
+    private static final String HOST = System.getenv("DB_HOST");
+    private static final String PORT = System.getenv("DB_PORT");
+    private static final String DATABASE = System.getenv("DB_NAME");
+    private static final String USER = System.getenv("DB_USER");
+    private static final String PASSWORD = System.getenv("DB_PASSWORD");
     private static final String SCHEMA = "public";
     private static final String POOL_MODE = "transaction";
 
@@ -21,4 +21,3 @@ public class DatabaseConnection {
         return DriverManager.getConnection(URL, USER, PASSWORD);
     }
 }
-
