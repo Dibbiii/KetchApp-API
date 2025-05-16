@@ -19,7 +19,7 @@ public class KetchappApplication {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
                 registry.addMapping("/**") // Consente tutte le rotte
-                        .allowedOrigins("http://localhost:49810") // Sostituisci con il dominio del front-end
+                        .allowedOrigins("http://localhost:56501") // Sostituisci con il dominio del front-end
                         .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH") // Metodi consentiti
                         .allowedHeaders("*") // Consente tutti gli header
                         .allowCredentials(true); // Consente l'invio di cookie

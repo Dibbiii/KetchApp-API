@@ -40,9 +40,9 @@ public class UsersControllers {
             return null;
         }
         return new UserEntity(
+                dto.getUsername(),
                 dto.getEmail(),
-                dto.getFirebaseUid(),
-                dto.getUsername());
+                dto.getFirebaseUid());
     }
 
     @Transactional
