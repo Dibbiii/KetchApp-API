@@ -1,8 +1,8 @@
-package com.alessandra_alessandro.ketchapp.controller;
+package com.alessandra_alessandro.ketchapp.controllers;
 
 import com.alessandra_alessandro.ketchapp.models.dto.UserDto;
 import com.alessandra_alessandro.ketchapp.models.entity.UserEntity;
-import com.alessandra_alessandro.ketchapp.repository.UsersRepository;
+import com.alessandra_alessandro.ketchapp.repositories.UsersRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

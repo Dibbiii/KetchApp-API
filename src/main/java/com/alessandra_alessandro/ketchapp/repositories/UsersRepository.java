@@ -1,17 +1,17 @@
-package com.alessandra_alessandro.ketchapp.repository;
+package com.alessandra_alessandro.ketchapp.repositories;
 
 import com.alessandra_alessandro.ketchapp.models.entity.UserEntity;
 import com.alessandra_alessandro.ketchapp.utils.DatabaseConnection;
 import org.springframework.stereotype.Repository;
 
 import java.sql.*;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Repository
-public class UsersRepository {
+public class UsersRepository implements GenericRepository<UserEntity, UUID>{
     public List<UserEntity> findAll() throws SQLException {
         List<UserEntity> records = new ArrayList<>();
         try (Connection conn = DatabaseConnection.getConnection()) {
@@ -46,7 +46,7 @@ public class UsersRepository {
             return null;
         }
     }
-
+    //* Create a new user
     //* Delete a user
     //* Update a user
     //* Find a user by UUID
@@ -67,4 +67,33 @@ public class UsersRepository {
         }
     }
 
+    @Override
+    public UserEntity create(UserEntity entity) {
+        // TODO: Implement UserRepository.create
+        return null;
+    }
+
+    @Override
+    public UserEntity update(UserEntity entity) {
+        // TODO: Implement UserRepository.update
+        return null;
+    }
+
+    @Override
+    public UserEntity delete(UserEntity entity) {
+        // TODO: Implement UserRepository.delete
+        return null;
+    }
+
+    @Override
+    public Optional<UserEntity> selectById(UUID uuid) {
+        // TODO: Implement UserRepository.selectById
+        return Optional.empty();
+    }
+
+    @Override
+    public List<UserEntity> selectAll() {
+        // TODO: Implement UserRepository.selectAll
+        return List.of();
+    }
 }
