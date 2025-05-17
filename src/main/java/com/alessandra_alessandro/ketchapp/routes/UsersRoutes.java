@@ -144,9 +144,9 @@ public class UsersRoutes {
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
     @GetMapping("/email/{username}")
-    public ResponseEntity<String> getEmailByUsername(@PathVariable String username) {
+    public ResponseEntity<UserDto> getEmailByUsername(@PathVariable String username) {
         try {
-            String email = usersController.getEmailByUsername(username);
+            UserDto email = usersController.getEmailByUsername(username);
             if (email != null) {
                 return ResponseEntity.ok(email);
             } else {

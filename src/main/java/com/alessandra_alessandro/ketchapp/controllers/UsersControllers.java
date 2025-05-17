@@ -35,16 +35,16 @@ public class UsersControllers {
         );
     }
 
-private UserEntity convertDtoToEntity(UserDto dto) {
-    if (dto == null) {
-        return null;
+    private UserEntity convertDtoToEntity(UserDto dto) {
+        if (dto == null) {
+            return null;
+        }
+        return new UserEntity(
+                dto.getUsername(),      // Corretto: username per primo
+                dto.getEmail(),         // email per secondo
+                dto.getFirebaseUid()    // firebaseUid per terzo
+        );
     }
-    return new UserEntity(
-        dto.getUsername(),      // Corretto: username per primo
-        dto.getEmail(),         // email per secondo
-        dto.getFirebaseUid()    // firebaseUid per terzo
-    );
-}
 
     @Transactional
     public UserDto createUser(UserDto userDto) {
@@ -73,7 +73,7 @@ private UserEntity convertDtoToEntity(UserDto dto) {
         }
     }
 
-        public List<UserDto> getUsers() {
+    public List<UserDto> getUsers() {
         List<UserEntity> entities = usersRepository.findAll();
         return entities.stream()
                 .map(this::convertEntityToDto)
@@ -93,12 +93,15 @@ private UserEntity convertDtoToEntity(UserDto dto) {
     }
 
     // Restituisce la mail dato l'username
-    public String getEmailByUsername(String username) {
+    public UserDto getEmailByUsername(String username) {
         if (username == null || username.isEmpty()) {
             throw new IllegalArgumentException("Username cannot be null or empty");
         }
-        return usersRepository.findByUsername(username)
-                .map(UserEntity::getEmail)
-                .orElseThrow(() -> new IllegalArgumentException("Utente con username '" + username + "' non trovato."));
+        Optional<UserEntity> entityOptional = usersRepository.findByUsername(username);
+        if (entityOptional.isPresent()) {
+            return convertEntityToDto(entityOptional.get());
+        } else {
+            throw new IllegalArgumentException("User with username '" + username + "' not found.");
+        }
     }
 }
