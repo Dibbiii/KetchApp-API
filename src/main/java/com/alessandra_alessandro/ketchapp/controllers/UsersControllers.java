@@ -40,9 +40,10 @@ public class UsersControllers {
             return null;
         }
         return new UserEntity(
+                dto.getFirebaseUid(),
                 dto.getUsername(),      // Corretto: username per primo
-                dto.getEmail(),         // email per secondo
-                dto.getFirebaseUid()    // firebaseUid per terzo
+                dto.getEmail()    // email per secondo
+                    // firebaseUid per terzo
         );
     }
 

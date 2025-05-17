@@ -35,7 +35,7 @@ public class UserEntity {
     @Column(name = "created_at")
     private Timestamp createdAt = new Timestamp(System.currentTimeMillis());
 
-    public UserEntity(String username, String email, String firebaseUid) {
+    public UserEntity(String firebaseUid, String email, String username) {
         this.email = email;
         this.firebaseUid = firebaseUid;
         this.username = username;
