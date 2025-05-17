@@ -1,5 +1,10 @@
 package com.alessandra_alessandro.ketchapp.controllers;
 
+// Aggiungi le dipendenze del Firebase Admin SDK nel build.gradle:
+// implementation 'com.google.firebase:firebase-admin:9.2.0'
+
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseToken;
 import com.alessandra_alessandro.ketchapp.models.dto.UserDto;
 import com.alessandra_alessandro.ketchapp.models.entity.UserEntity;
 import com.alessandra_alessandro.ketchapp.repositories.UsersRepository;
@@ -103,6 +108,33 @@ public class UsersControllers {
             return convertEntityToDto(entityOptional.get());
         } else {
             throw new IllegalArgumentException("User with username '" + username + "' not found.");
+        }
+    }
+
+    public UserDto loginWithGoogleToken(String idTokenString) {
+        try {
+            // Verifica il token Google/Firebase
+            FirebaseToken decodedToken = FirebaseAuth.getInstance().verifyIdToken(idTokenString);
+            String firebaseUid = decodedToken.getUid();
+            String email = decodedToken.getEmail();
+            String username = decodedToken.getName(); // oppure ricavarla come preferisci
+
+            Optional<UserEntity> entityOptional = usersRepository.findByFirebaseUid(firebaseUid);
+
+            UserEntity userEntity;
+            // Se l'utente esiste già, aggiornalo se necessario
+            if (entityOptional.isPresent()) {
+                userEntity = entityOptional.get();
+                userEntity.setEmail(email);
+                userEntity.setUsername(username);
+            } else {
+                // Altrimenti creane uno nuovo
+                userEntity = new UserEntity(firebaseUid, email, username);
+            }
+            usersRepository.save(userEntity);
+            return convertEntityToDto(userEntity);
+        } catch (Exception e) {
+            throw new RuntimeException("Token Google non valido", e);
         }
     }
 }

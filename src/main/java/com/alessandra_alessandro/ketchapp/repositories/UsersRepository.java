@@ -11,6 +11,8 @@ import java.util.UUID;
 public interface UsersRepository extends JpaRepository<UserEntity, UUID> {
     Optional<UserEntity> findByUsername(String username);
 
+    Optional<UserEntity> findByFirebaseUid(String firebaseUid);
+
     // Non è necessario dichiarare metodi come save, findById, findAll, deleteById, etc.,
     // perché sono già forniti da JpaRepository<UserEntity, UUID>.
 
