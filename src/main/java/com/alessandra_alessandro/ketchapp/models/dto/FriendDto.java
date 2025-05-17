@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.sql.Timestamp;
+import java.util.UUID;
 
 @Getter
 @Setter
@@ -15,9 +16,9 @@ public class FriendDto {
 
     private String id;
 
-    private String userUUID;
+    private UUID userUUID;
 
-    private String friendUUID;
+    private UUID friendUUID;
 
     private Timestamp createdAt;
 }

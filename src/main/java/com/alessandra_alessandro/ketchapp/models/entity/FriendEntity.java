@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.sql.Timestamp;
+import java.util.UUID;
 
 @Entity
 @Table(name = "friends")
@@ -20,15 +21,15 @@ public class FriendEntity {
     private String id;
 
     @Column(name = "user_uuid")
-    private String userUUID;
+    private UUID userUUID;
 
     @Column(name = "friend_uuid")
-    private String friendUUID;
+    private UUID friendUUID;
 
     @Column(name = "created_at")
     private Timestamp createdAt = new Timestamp(System.currentTimeMillis());
 
-    public FriendEntity(String userUUID, String friendUUID) {
+    public FriendEntity(UUID userUUID, UUID friendUUID) {
         this.userUUID = userUUID;
         this.friendUUID = friendUUID;
     }
