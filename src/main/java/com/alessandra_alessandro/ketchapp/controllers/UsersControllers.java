@@ -39,13 +39,13 @@ public class UsersControllers {
         if (dto == null) {
             return null;
         }
+        // L'ordine giusto è: firebaseUid, email, username
         return new UserEntity(
-                dto.getFirebaseUid(),
-                dto.getUsername(),      // Corretto: username per primo
-                dto.getEmail()    // email per secondo
-                    // firebaseUid per terzo
-        );
-    }
+        dto.getFirebaseUid(),   // firebaseUid
+        dto.getEmail(),         // email
+        dto.getUsername()       // username
+    );
+}
 
     @Transactional
     public UserDto createUser(UserDto userDto) {
