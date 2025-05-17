@@ -35,15 +35,16 @@ public class UsersControllers {
         );
     }
 
-    private UserEntity convertDtoToEntity(UserDto dto) {
-        if (dto == null) {
-            return null;
-        }
-        return new UserEntity(
-                dto.getEmail(),
-                dto.getFirebaseUid(),
-                dto.getUsername());
+private UserEntity convertDtoToEntity(UserDto dto) {
+    if (dto == null) {
+        return null;
     }
+    return new UserEntity(
+        dto.getUsername(),      // Corretto: username per primo
+        dto.getEmail(),         // email per secondo
+        dto.getFirebaseUid()    // firebaseUid per terzo
+    );
+}
 
     @Transactional
     public UserDto createUser(UserDto userDto) {
@@ -91,16 +92,13 @@ public class UsersControllers {
         }
     }
 
-//    public UserDto searchUser(String username) {
-//        if (username == null || username.isEmpty()) {
-//            throw new IllegalArgumentException("Username cannot be null or empty");
-//        }
-//        List<UserEntity> entities = usersRepository.findByUsername(username);
-//        if (entities.isEmpty()) {
-//            throw new IllegalArgumentException("User with username '" + username + "' not found.");
-//        }
-//        return convertEntityToDto(entities.get(0));
-//    }
-
-
+    // Restituisce la mail dato l'username
+    public String getEmailByUsername(String username) {
+        if (username == null || username.isEmpty()) {
+            throw new IllegalArgumentException("Username cannot be null or empty");
+        }
+        return usersRepository.findByUsername(username)
+                .map(UserEntity::getEmail)
+                .orElseThrow(() -> new IllegalArgumentException("Utente con username '" + username + "' non trovato."));
+    }
 }

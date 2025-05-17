@@ -135,6 +135,30 @@ public class UsersRoutes {
         }
     }
 
+    @Operation(summary = "Get email by username", description = "Fetches the email address associated with a given username.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully retrieved email address",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = String.class))),
+            @ApiResponse(responseCode = "404", description = "Username not found"),
+            @ApiResponse(responseCode = "500", description = "Internal server error")
+    })
+    @GetMapping("/email/{username}")
+    public ResponseEntity<String> getEmailByUsername(@PathVariable String username) {
+        try {
+            String email = usersController.getEmailByUsername(username);
+            if (email != null) {
+                return ResponseEntity.ok(email);
+            } else {
+                return ResponseEntity.notFound().build();
+            }
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().build();
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
 //    @Operation(summary = "Get tomatoes by user UUID", description = "Fetches a list of tomatoes for a specific user by their UUID.")
 //    @ApiResponses(value = {
 //            @ApiResponse(responseCode = "200", description = "Successfully retrieved tomatoes for user",
