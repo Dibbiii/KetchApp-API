@@ -4,18 +4,20 @@ import com.google.auth.oauth2.GoogleCredentials;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.FirebaseOptions;
 import jakarta.annotation.PostConstruct;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Component;
 
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 
 @Component
 public class FirebaseConfig {
     @PostConstruct
     public void initialize() throws IOException {
         if (FirebaseApp.getApps().isEmpty()) {
-            FileInputStream serviceAccount =
-                    new FileInputStream("path/ai/tuoi/firebase-service-account.json");
+            InputStream serviceAccount =
+                    new ClassPathResource("firebase-service-account.json").getInputStream();
             FirebaseOptions options = new FirebaseOptions.Builder()
                     .setCredentials(GoogleCredentials.fromStream(serviceAccount))
                     .build();
@@ -23,3 +25,4 @@ public class FirebaseConfig {
         }
     }
 }
+
