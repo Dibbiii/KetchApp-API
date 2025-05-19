@@ -17,7 +17,7 @@ public class FirebaseConfig {
     public void initialize() throws IOException {
         if (FirebaseApp.getApps().isEmpty()) {
             InputStream serviceAccount =
-                    new ClassPathResource("firebase-service-account.json").getInputStream();
+                    new ClassPathResource("testalebrutto-3309f60393db.json").getInputStream();
             FirebaseOptions options = new FirebaseOptions.Builder()
                     .setCredentials(GoogleCredentials.fromStream(serviceAccount))
                     .build();
