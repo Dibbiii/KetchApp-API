@@ -14,9 +14,6 @@ USING (id = (select auth.uid()));
 - Users 
 
 ## Todo List
-- [ ] Aggiungere Input Username Register
-- [ ] Mettere Input Username/Email Login
-- [ ] Login With Google/Facebook/Apple/Github
 - [ ] Fare le Api di Rankings
 - [ ] Invertire Profile e Settings
 - [ ] Inserire un Calendario Syncronizzato con Google/Outlook Calendar
