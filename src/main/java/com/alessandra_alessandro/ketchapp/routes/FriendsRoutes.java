@@ -72,7 +72,7 @@ public class FriendsRoutes {
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
     @PostMapping
-    public ResponseEntity<FriendDto> createFriendship(FriendDto friendDtoToCreate) {
+    public ResponseEntity<FriendDto> createFriendship(@RequestBody FriendDto friendDtoToCreate) {
         try {
             FriendDto createdFriend = friendsController.createFriendship(friendDtoToCreate);
             return ResponseEntity.status(HttpStatus.CREATED).body(createdFriend);

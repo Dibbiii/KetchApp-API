@@ -19,11 +19,11 @@ public class AppointmentDto {
 
     private UUID userUUID;
 
-    private Timestamp createdAt;
-
     private String name;
 
     private Timestamp startAt;
 
     private Timestamp endAt;
+
+    private Timestamp createdAt;
 }

@@ -3,10 +3,10 @@ package com.alessandra_alessandro.ketchapp.controllers;
 // Aggiungi le dipendenze del Firebase Admin SDK nel build.gradle:
 // implementation 'com.google.firebase:firebase-admin:9.2.0'
 
+import com.alessandra_alessandro.ketchapp.models.dto.*;
+import com.alessandra_alessandro.ketchapp.models.entity.*;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseToken;
-import com.alessandra_alessandro.ketchapp.models.dto.UserDto;
-import com.alessandra_alessandro.ketchapp.models.entity.UserEntity;
 import com.alessandra_alessandro.ketchapp.repositories.UsersRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -111,30 +111,82 @@ public class UsersControllers {
         }
     }
 
-    public UserDto loginWithGoogleToken(String idTokenString) {
-        try {
-            // Verifica il token Google/Firebase
-            FirebaseToken decodedToken = FirebaseAuth.getInstance().verifyIdToken(idTokenString);
-            String firebaseUid = decodedToken.getUid();
-            String email = decodedToken.getEmail();
-            String username = decodedToken.getName(); // oppure ricavarla come preferisci
-
-            Optional<UserEntity> entityOptional = usersRepository.findByFirebaseUid(firebaseUid);
-
-            UserEntity userEntity;
-            // Se l'utente esiste già, aggiornalo se necessario
-            if (entityOptional.isPresent()) {
-                userEntity = entityOptional.get();
-                userEntity.setEmail(email);
-                userEntity.setUsername(username);
-            } else {
-                // Altrimenti creane uno nuovo
-                userEntity = new UserEntity(firebaseUid, email, username);
-            }
-            usersRepository.save(userEntity);
-            return convertEntityToDto(userEntity);
-        } catch (Exception e) {
-            throw new RuntimeException("Token Google non valido", e);
+    public List<TomatoDto> getUserTomatoes(UUID uuid) {
+        if (uuid == null) {
+            throw new IllegalArgumentException("UUID cannot be null");
         }
+        List<TomatoEntity> tomatoes = usersRepository.findTomatoesByUuid(uuid);
+        return tomatoes.stream()
+                .map(tomato -> new TomatoDto(
+                        tomato.getId(),
+                        tomato.getUserUUID(),
+                        tomato.getGroupId(),
+                        tomato.getStartAt(),
+                        tomato.getEndAt(),
+                        tomato.getPauseAt(),
+                        tomato.getNextTomatoId(),
+                        tomato.getSubject(),
+                        tomato.getCreatedAt()
+                )).collect(Collectors.toList());
+    }
+
+    public List<ActivityDto> getUserActivities(UUID uuid) {
+        if (uuid == null) {
+            throw new IllegalArgumentException("UUID cannot be null");
+        }
+        List<ActivityEntity> activities = usersRepository.findActivitiesByUuid(uuid);
+        return activities.stream()
+                .map(activity -> new ActivityDto(
+                        activity.getId(),
+                        activity.getUserUUID(),
+                        activity.getTomatoId(),
+                        activity.getType(),
+                        activity.getAction(),
+                        activity.getCreatedAt()
+                )).collect(Collectors.toList());
+    }
+
+    public List<AchievementDto> getUserAchievements(UUID uuid) {
+        if (uuid == null) {
+            throw new IllegalArgumentException("UUID cannot be null");
+        }
+        List<AchievementEntity> achievements = usersRepository.findAchievementsByUuid(uuid);
+        return achievements.stream()
+                .map(achievement -> new AchievementDto(
+                        achievement.getId(),
+                        achievement.getUserUUID(),
+                        achievement.getAchievementNumber(),
+                        achievement.getCreatedAt()
+                )).collect(Collectors.toList());
+    }
+
+    public List<FriendDto> getUserFriends(UUID uuid) {
+        if (uuid == null) {
+            throw new IllegalArgumentException("UUID cannot be null");
+        }
+        List<FriendEntity> friends = usersRepository.findFriendsByUuid(uuid);
+        return friends.stream()
+                .map(friend -> new FriendDto(
+                        friend.getId(),
+                        friend.getUserUUID(),
+                        friend.getFriendUUID(),
+                        friend.getCreatedAt()
+                )).collect(Collectors.toList());
+    }
+
+    public List<AppointmentDto> getUserAppointments(UUID uuid) {
+        if (uuid == null) {
+            throw new IllegalArgumentException("UUID cannot be null");
+        }
+        List<AppointmentEntity> appointments = usersRepository.findAppointmentsByUuid(uuid);
+        return appointments.stream()
+                .map(appointment -> new AppointmentDto(
+                        appointment.getId(),
+                        appointment.getUserUUID(),
+                        appointment.getName(),
+                        appointment.getStartAt(),
+                        appointment.getEndAt(),
+                        appointment.getCreatedAt()
+                )).collect(Collectors.toList());
     }
 }

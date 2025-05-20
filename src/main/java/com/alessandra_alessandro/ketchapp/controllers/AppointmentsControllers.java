@@ -28,10 +28,10 @@ public class AppointmentsControllers {
         return new AppointmentDto(
                 entity.getId(),
                 entity.getUserUUID(),
-                entity.getCreatedAt(),
                 entity.getName(),
                 entity.getStartAt(),
-                entity.getEndAt()
+                entity.getEndAt(),
+                entity.getCreatedAt()
         );
     }
 

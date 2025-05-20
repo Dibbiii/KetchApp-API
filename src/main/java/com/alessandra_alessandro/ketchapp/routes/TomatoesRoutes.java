@@ -72,7 +72,7 @@ public class TomatoesRoutes {
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
     @PostMapping
-    public ResponseEntity<TomatoDto> createTomato(TomatoDto tomatoDtoToCreate) {
+    public ResponseEntity<TomatoDto> createTomato(@RequestBody TomatoDto tomatoDtoToCreate) {
         try {
             TomatoDto createdTomato = tomatoesController.createTomato(tomatoDtoToCreate);
             return ResponseEntity.status(HttpStatus.CREATED).body(createdTomato);

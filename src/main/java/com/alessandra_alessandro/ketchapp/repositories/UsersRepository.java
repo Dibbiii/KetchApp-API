@@ -1,9 +1,16 @@
 package com.alessandra_alessandro.ketchapp.repositories;
 
-import com.alessandra_alessandro.ketchapp.models.entity.UserEntity;
+import com.alessandra_alessandro.ketchapp.models.entity.*;
+import org.springframework.data.domain.Limit;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -11,20 +18,18 @@ import java.util.UUID;
 public interface UsersRepository extends JpaRepository<UserEntity, UUID> {
     Optional<UserEntity> findByUsername(String username);
 
-    Optional<UserEntity> findByFirebaseUid(String firebaseUid);
+    @Query("SELECT t FROM TomatoEntity t WHERE t.userUUID = :userUUID")
+    List<TomatoEntity> findTomatoesByUuid(@Param("userUUID") UUID userUUID);
 
-    // Non è necessario dichiarare metodi come save, findById, findAll, deleteById, etc.,
-    // perché sono già forniti da JpaRepository<UserEntity, UUID>.
+    @Query("SELECT a FROM ActivityEntity a WHERE a.userUUID = :userUUID")
+    List<ActivityEntity> findActivitiesByUuid(@Param("userUUID") UUID userUUID);
 
-    // Se avevi una logica specifica nel tuo vecchio metodo `deleteByUUID` che restituiva l'entità,
-    // quella logica ora dovrebbe risiedere in un Service layer, come discusso in precedenza.
-    // Il repository si occupa delle operazioni dirette con il database.
-    // Esempio:
-    // In UserService:
-    // UserEntity user = userRepository.findById(uuid).orElse(null);
-    // if (user != null) {
-    //     userRepository.deleteById(uuid);
-    //     return user;
-    // }
-    // return null;
+    @Query("SELECT a FROM AchievementEntity a WHERE a.userUUID = :userUUID")
+    List<AchievementEntity> findAchievementsByUuid(@Param("userUUID") UUID userUUID);
+
+    @Query("SELECT f FROM FriendEntity f WHERE f.userUUID = :userUUID")
+    List<FriendEntity> findFriendsByUuid(@Param("userUUID") UUID userUUID);
+
+    @Query("SELECT a FROM AppointmentEntity a WHERE a.userUUID = :userUUID")
+    List<AppointmentEntity> findAppointmentsByUuid(@Param("userUUID") UUID userUUID);
 }
