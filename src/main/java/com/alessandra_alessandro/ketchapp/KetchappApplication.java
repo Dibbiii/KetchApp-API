@@ -22,7 +22,7 @@ public class KetchappApplication {
                         .allowedOrigins("*")
                         .allowedMethods("*")
                         .allowedHeaders("*")
-                        .allowCredentials(false);
+                        .allowCredentials(true);
             }
         };
     }
