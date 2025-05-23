@@ -1,10 +1,8 @@
 package com.alessandra_alessandro.ketchapp.models.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
+import java.io.Serializable;
 import java.sql.Timestamp;
 import java.util.UUID;
 
@@ -12,7 +10,7 @@ import java.util.UUID;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class TomatoDto {
+public class TomatoDto implements Serializable {
 
     private Integer id;
 
@@ -31,16 +29,4 @@ public class TomatoDto {
     private String subject;
 
     private Timestamp createdAt;
-
-    public TomatoDto(Integer id, UUID userUUID, Object o, Integer groupId, Timestamp startAt, Timestamp endAt, Timestamp pauseAt, Integer nextTomatoId, String subject, Timestamp createdAt) {
-        this.id = id;
-        this.userUUID = userUUID;
-        this.groupId = groupId;
-        this.startAt = startAt;
-        this.endAt = endAt;
-        this.pauseAt = pauseAt;
-        this.nextTomatoId = nextTomatoId;
-        this.subject = subject;
-        this.createdAt = createdAt;
-    }
 }

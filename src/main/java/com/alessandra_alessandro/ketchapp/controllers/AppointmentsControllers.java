@@ -68,13 +68,7 @@ public class AppointmentsControllers {
 
     @Transactional
     public AppointmentDto createAppointment(AppointmentDto appointmentDto) {
-        if (appointmentDto == null || appointmentDto.getUserUUID() == null) {
-            throw new IllegalArgumentException("Appointment data or user UUID cannot be null");
-        }
         AppointmentEntity appointmentEntity = convertDtoToEntity(appointmentDto);
-        if (appointmentEntity == null) {
-            throw new IllegalArgumentException("AppointmentEntity cannot be null");
-        }
         appointmentEntity = appointmentsRepository.save(appointmentEntity);
         return convertEntityToDto(appointmentEntity);
     }

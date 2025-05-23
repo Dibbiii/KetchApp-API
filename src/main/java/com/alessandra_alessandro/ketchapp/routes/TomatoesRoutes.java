@@ -1,6 +1,7 @@
 package com.alessandra_alessandro.ketchapp.routes;
 
 import com.alessandra_alessandro.ketchapp.controllers.TomatoesControllers;
+import com.alessandra_alessandro.ketchapp.models.dto.GroupDto;
 import com.alessandra_alessandro.ketchapp.models.dto.TomatoDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;

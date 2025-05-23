@@ -14,7 +14,6 @@ import java.util.UUID;
 @AllArgsConstructor
 public class AchievementDto {
 
-
     private Integer id;
 
     private UUID userUUID;

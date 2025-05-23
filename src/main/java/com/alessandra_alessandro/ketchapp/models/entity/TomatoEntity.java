@@ -16,6 +16,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 public class TomatoEntity {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
@@ -32,8 +33,8 @@ public class TomatoEntity {
     @Column(name = "end_at")
     private Timestamp endAt;
 
-    @Column(name = "pause_at")
-    private Timestamp pauseAt;
+    @Column(name = "pause_end")
+    private Timestamp pauseEnd;
 
     @Column(name = "next_tomato_id")
     private Integer nextTomatoId;
@@ -43,13 +44,14 @@ public class TomatoEntity {
     @Column(name = "created_at")
     private Timestamp createdAt = new Timestamp(System.currentTimeMillis());
 
-    public TomatoEntity(UUID userUUID, Integer groupId, Timestamp startAt, Timestamp endAt, Timestamp pauseAt, Integer nextTomatoId, String subject) {
+    public TomatoEntity(UUID userUUID, Integer groupId, Timestamp startAt, Timestamp endAt, Timestamp pauseEnd, Integer nextTomatoId, String subject) {
         this.userUUID = userUUID;
         this.groupId = groupId;
         this.startAt = startAt;
         this.endAt = endAt;
-        this.pauseAt = pauseAt;
+        this.pauseEnd = pauseEnd;
         this.nextTomatoId = nextTomatoId;
         this.subject = subject;
     }
+
 }

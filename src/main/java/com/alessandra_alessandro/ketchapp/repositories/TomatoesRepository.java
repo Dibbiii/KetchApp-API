@@ -5,4 +5,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface TomatoesRepository extends JpaRepository<TomatoEntity, Integer> {
     // TODO: See if we need to add more methods here TomatoesRepository
+
 }

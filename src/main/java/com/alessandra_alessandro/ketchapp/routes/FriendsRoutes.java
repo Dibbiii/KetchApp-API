@@ -32,6 +32,7 @@ public class FriendsRoutes {
             @ApiResponse(responseCode = "404", description = "Friends list not found"),
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
+    @GetMapping
     public ResponseEntity<List<FriendDto>> getFriends() {
         try {
             List<FriendDto> friends = friendsController.getFriends();
