@@ -5,8 +5,6 @@ package com.alessandra_alessandro.ketchapp.controllers;
 
 import com.alessandra_alessandro.ketchapp.models.dto.*;
 import com.alessandra_alessandro.ketchapp.models.entity.*;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseToken;
 import com.alessandra_alessandro.ketchapp.repositories.UsersRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -46,11 +44,11 @@ public class UsersControllers {
         }
         // L'ordine giusto è: firebaseUid, email, username
         return new UserEntity(
-        dto.getFirebaseUid(),   // firebaseUid
-        dto.getEmail(),         // email
-        dto.getUsername()       // username
-    );
-}
+                dto.getFirebaseUid(),   // firebaseUid
+                dto.getEmail(),         // email
+                dto.getUsername()       // username
+        );
+    }
 
     @Transactional
     public UserDto createUser(UserDto userDto) {
@@ -123,7 +121,7 @@ public class UsersControllers {
                         tomato.getGroupId(),
                         tomato.getStartAt(),
                         tomato.getEndAt(),
-                        tomato.getPauseAt(),
+                        tomato.getPauseEnd(),
                         tomato.getNextTomatoId(),
                         tomato.getSubject(),
                         tomato.getCreatedAt()
@@ -189,4 +187,22 @@ public class UsersControllers {
                         appointment.getCreatedAt()
                 )).collect(Collectors.toList());
     }
+
+
+    public StatisticsDto getUserStatistics(UUID uuid) {
+        if (uuid == null) {
+            throw new IllegalArgumentException("UUID cannot be null");
+        }
+        StatisticEntity statistic = usersRepository.findTomatoIdsWithStartAndEnd(uuid);
+        if (statistic != null) {
+            return new StatisticsDto(
+                    statistic.getUserUUID(),
+                    statistic.getTotalTomatoes(),
+                    statistic.getTotalTime()
+            );
+        } else {
+            throw new IllegalArgumentException("Statistics for user with UUID '" + uuid + "' not found.");
+        }
+    }
 }
+

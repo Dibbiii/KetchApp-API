@@ -22,7 +22,7 @@ public class TomatoDto implements Serializable {
 
     private Timestamp endAt;
 
-    private Timestamp pauseAt;
+    private Timestamp pauseEnd;
 
     private Integer nextTomatoId;
 

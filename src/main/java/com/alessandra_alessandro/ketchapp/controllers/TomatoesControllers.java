@@ -31,7 +31,7 @@ public class TomatoesControllers {
                 entity.getGroupId(),
                 entity.getStartAt(),
                 entity.getEndAt(),
-                entity.getPauseAt(),
+                entity.getPauseEnd(),
                 entity.getNextTomatoId(),
                 entity.getSubject(),
                 entity.getCreatedAt()
@@ -47,7 +47,7 @@ public class TomatoesControllers {
                 dto.getGroupId(),
                 dto.getStartAt(),
                 dto.getEndAt(),
-                dto.getPauseAt(),
+                dto.getPauseEnd(),
                 dto.getNextTomatoId(),
                 dto.getSubject()
         );

@@ -249,4 +249,28 @@ public class UsersRoutes {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
+
+    @Operation(summary = "Get statistics by user UUID", description = "Fetches statistics for a specific user by their UUID.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully retrieved statistics for user",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = StatisticsDto.class))),
+            @ApiResponse(responseCode = "404", description = "User not found"),
+            @ApiResponse(responseCode = "500", description = "Internal server error")
+    })
+    @GetMapping("/{uuid}/statistics")
+    public ResponseEntity<StatisticsDto> getUserStatistics(@PathVariable UUID uuid) {
+        try {
+            StatisticsDto statistics = usersController.getUserStatistics(uuid);
+            if (statistics != null) {
+                return ResponseEntity.ok(statistics);
+            } else {
+                return ResponseEntity.notFound().build();
+            }
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().build();
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
 }

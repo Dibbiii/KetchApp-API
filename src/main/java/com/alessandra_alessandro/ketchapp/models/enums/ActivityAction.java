@@ -4,5 +4,5 @@ public enum ActivityAction {
     START,
     STOP,
     PAUSE,
-    RESUME,
+    RESUME
 }
