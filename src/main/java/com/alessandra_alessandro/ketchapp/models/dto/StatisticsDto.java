@@ -16,6 +16,8 @@ public class StatisticsDto {
 
     private LocalDate date;
 
+    private Double totalHours;
+
     private List<SubjectHoursDto> subjects;
 }
 

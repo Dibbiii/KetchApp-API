@@ -31,7 +31,7 @@ public interface UsersRepository extends JpaRepository<UserEntity, UUID> {
     List<AppointmentEntity> findAppointmentsByUuid(@Param("userUUID") UUID userUUID);
 
     @Query("SELECT DISTINCT t.subject FROM TomatoEntity t WHERE t.userUUID = :userUUID AND DATE(t.createdAt) = DATE(:date) ORDER BY t.subject")
-    List<String> findSubjectsByUuidAndDate(@Param("userUUID") UUID userUUID, @Param("date") LocalDate date);
+    List<String> findSubjectsByUuidAndDate(@Param("userUUID") UUID userUUID, @Param("date") String date);
 
     @Query(
             value = """
@@ -50,5 +50,5 @@ public interface UsersRepository extends JpaRepository<UserEntity, UUID> {
     Double findTotalHoursByUserAndSubjectAndDate(
             @Param("userUUID") UUID userUUID,
             @Param("subject") String subject,
-            @Param("date") LocalDate date);
+            @Param("date") String date);
 }

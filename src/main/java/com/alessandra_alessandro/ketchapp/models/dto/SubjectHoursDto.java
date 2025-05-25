@@ -13,6 +13,6 @@ public class SubjectHoursDto {
 
     private String subjectName;
 
-    private Double hours;
+    private Double totalHours;
 }
 

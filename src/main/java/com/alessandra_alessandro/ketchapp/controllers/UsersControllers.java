@@ -199,15 +199,24 @@ public class UsersControllers {
             throw new IllegalArgumentException("Date cannot be null");
         }
         List<SubjectHoursDto> subjectHoursList = new ArrayList<>();
-        usersRepository.findSubjectsByUuidAndDate(uuid, date)
+        usersRepository.findSubjectsByUuidAndDate(uuid, date.toString())
                 .forEach(subject -> {
-                    Double totalHours = usersRepository.findTotalHoursByUserAndSubjectAndDate(uuid, subject, date);
+                    Double totalHours = usersRepository.findTotalHoursByUserAndSubjectAndDate(uuid, subject, date.toString());
                     if (totalHours != null) {
-                        subjectHoursList.add(new SubjectHoursDto(subject, totalHours));
+                        subjectHoursList.add(
+                                new SubjectHoursDto(
+                                        subject,
+                                        totalHours
+                                )
+                        );
                     }
                 });
 
-        return new StatisticsDto(date, subjectHoursList);
+        return new StatisticsDto(
+                date,
+                subjectHoursList.stream()
+                        .mapToDouble(SubjectHoursDto::getTotalHours)
+                        .sum(),
+                subjectHoursList);
     }
 }
-
