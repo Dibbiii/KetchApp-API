@@ -12,7 +12,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 @RestController
@@ -259,9 +262,10 @@ public class UsersRoutes {
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
     @GetMapping("/{uuid}/statistics")
-    public ResponseEntity<StatisticsDto> getUserStatistics(@PathVariable UUID uuid) {
+    public ResponseEntity<StatisticsDto> getUserStatistics(@PathVariable UUID uuid,
+                                                           @RequestParam(required = true) LocalDate date) {
         try {
-            StatisticsDto statistics = usersController.getUserStatistics(uuid);
+            StatisticsDto statistics = usersController.getUserStatistics(uuid, date);
             if (statistics != null) {
                 return ResponseEntity.ok(statistics);
             } else {

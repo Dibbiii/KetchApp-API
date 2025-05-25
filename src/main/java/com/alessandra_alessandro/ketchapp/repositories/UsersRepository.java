@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -29,16 +30,25 @@ public interface UsersRepository extends JpaRepository<UserEntity, UUID> {
     @Query("SELECT a FROM AppointmentEntity a WHERE a.userUUID = :userUUID")
     List<AppointmentEntity> findAppointmentsByUuid(@Param("userUUID") UUID userUUID);
 
-    @Query("""
-            SELECT t.id
-            FROM TomatoEntity t
-            WHERE t.userUUID = :userUUID
-              AND EXISTS (
-                SELECT 1 FROM ActivityEntity a WHERE a.tomatoId = t.id AND a.type = 'TIMER' AND a.action = 'START'
-              )
-              AND EXISTS (
-                SELECT 1 FROM ActivityEntity a WHERE a.tomatoId = t.id AND a.type = 'TIMER' AND a.action = 'END'
-              )
-            """)
-    List<ActivityEntity> findTomatoIdsWithStartAndEnd(@Param("userUUID") UUID userUUID);
+    @Query("SELECT DISTINCT t.subject FROM TomatoEntity t WHERE t.userUUID = :userUUID AND DATE(t.createdAt) = DATE(:date) ORDER BY t.subject")
+    List<String> findSubjectsByUuidAndDate(@Param("userUUID") UUID userUUID, @Param("date") LocalDate date);
+
+    @Query(
+            value = """
+                    SELECT SUM(EXTRACT(EPOCH FROM (a_stop.created_at - a_start.created_at))) / 3600.0 AS total_hours
+                    FROM Activities a_start JOIN Activities a_stop ON a_start.tomato_id = a_stop.tomato_id
+                                            JOIN Tomatoes t ON a_start.tomato_id = t.id
+                    WHERE a_start.user_uuid = :userUUID
+                      AND a_start.type = 'TIMER'
+                      AND a_start.action = 'START'
+                      AND a_stop.type = 'TIMER'
+                      AND a_stop.action = 'STOP'
+                      AND t.subject = :subject
+                      AND DATE(a_start.created_at) = DATE (:date)""",
+            nativeQuery = true
+    )
+    Double findTotalHoursByUserAndSubjectAndDate(
+            @Param("userUUID") UUID userUUID,
+            @Param("subject") String subject,
+            @Param("date") LocalDate date);
 }

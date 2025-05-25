@@ -10,6 +10,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -189,20 +191,23 @@ public class UsersControllers {
     }
 
 
-    public StatisticsDto getUserStatistics(UUID uuid) {
+    public StatisticsDto getUserStatistics(UUID uuid, LocalDate date) {
         if (uuid == null) {
             throw new IllegalArgumentException("UUID cannot be null");
         }
-        StatisticEntity statistic = usersRepository.findTomatoIdsWithStartAndEnd(uuid);
-        if (statistic != null) {
-            return new StatisticsDto(
-                    statistic.getUserUUID(),
-                    statistic.getTotalTomatoes(),
-                    statistic.getTotalTime()
-            );
-        } else {
-            throw new IllegalArgumentException("Statistics for user with UUID '" + uuid + "' not found.");
+        if (date == null) {
+            throw new IllegalArgumentException("Date cannot be null");
         }
+        List<SubjectHoursDto> subjectHoursList = new ArrayList<>();
+        usersRepository.findSubjectsByUuidAndDate(uuid, date)
+                .forEach(subject -> {
+                    Double totalHours = usersRepository.findTotalHoursByUserAndSubjectAndDate(uuid, subject, date);
+                    if (totalHours != null) {
+                        subjectHoursList.add(new SubjectHoursDto(subject, totalHours));
+                    }
+                });
+
+        return new StatisticsDto(date, subjectHoursList);
     }
 }
 
