@@ -5,14 +5,14 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.time.LocalDate;
-import java.util.List;
-
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class StatisticsDto {
-    private List<StatisticsDateDto> dates;
+public class StatisticsSubjectDto {
+
+    private String name;
+
+    private Double hours;
 }
 

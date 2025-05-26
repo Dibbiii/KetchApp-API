@@ -1,8 +1,5 @@
 package com.alessandra_alessandro.ketchapp.controllers;
 
-// Aggiungi le dipendenze del Firebase Admin SDK nel build.gradle:
-// implementation 'com.google.firebase:firebase-admin:9.2.0'
-
 import com.alessandra_alessandro.ketchapp.models.dto.*;
 import com.alessandra_alessandro.ketchapp.models.entity.*;
 import com.alessandra_alessandro.ketchapp.repositories.UsersRepository;
@@ -44,11 +41,10 @@ public class UsersControllers {
         if (dto == null) {
             return null;
         }
-        // L'ordine giusto è: firebaseUid, email, username
         return new UserEntity(
-                dto.getFirebaseUid(),   // firebaseUid
-                dto.getEmail(),         // email
-                dto.getUsername()       // username
+                dto.getFirebaseUid(),
+                dto.getEmail(),
+                dto.getUsername()
         );
     }
 
@@ -58,9 +54,6 @@ public class UsersControllers {
             throw new IllegalArgumentException("UserDto cannot be null");
         }
         UserEntity userEntity = convertDtoToEntity(userDto);
-        if (userEntity == null) {
-            throw new IllegalArgumentException("UserEntity cannot be null");
-        }
         userEntity = usersRepository.save(userEntity);
         return convertEntityToDto(userEntity);
     }
@@ -198,25 +191,26 @@ public class UsersControllers {
         if (date == null) {
             throw new IllegalArgumentException("Date cannot be null");
         }
-        List<SubjectHoursDto> subjectHoursList = new ArrayList<>();
-        usersRepository.findSubjectsByUuidAndDate(uuid, date.toString())
-                .forEach(subject -> {
-                    Double totalHours = usersRepository.findTotalHoursByUserAndSubjectAndDate(uuid, subject, date.toString());
-                    if (totalHours != null) {
-                        subjectHoursList.add(
-                                new SubjectHoursDto(
-                                        subject,
-                                        totalHours
-                                )
-                        );
-                    }
-                });
+        List<LocalDate> weekDates = new ArrayList<>(); // TODO: Simplify
+        for (int i = 0; i < 7; i++) {
+            weekDates.add(date.minusDays(i));
+        }
 
-        return new StatisticsDto(
-                date,
-                subjectHoursList.stream()
-                        .mapToDouble(SubjectHoursDto::getTotalHours)
-                        .sum(),
-                subjectHoursList);
+        List<StatisticsDateDto> statisticsDates = new ArrayList<>();
+        for (LocalDate weekDate : weekDates) {
+            List<String> subjects = usersRepository.findSubjectsByUuidAndDate(uuid, weekDate.toString());
+            List<StatisticsSubjectDto> statisticsSubjects = new ArrayList<>();
+            for (String subject : subjects) {
+                Double totalHours = usersRepository.findTotalHoursByUserAndSubjectAndDate(uuid, subject, weekDate.toString());
+                statisticsSubjects.add(new StatisticsSubjectDto(subject, totalHours));
+            }
+            statisticsDates.add(new StatisticsDateDto(
+                    weekDate,
+                    statisticsSubjects.stream().mapToDouble(StatisticsSubjectDto::getHours).sum(),
+                    statisticsSubjects));
+        }
+        StatisticsDto statisticsDto = new StatisticsDto();
+        statisticsDto.setDates(statisticsDates);
+        return statisticsDto;
     }
 }
