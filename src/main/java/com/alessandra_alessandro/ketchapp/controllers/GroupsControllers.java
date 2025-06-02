@@ -10,12 +10,8 @@ import java.util.List;
 
 @Service
 public class GroupsControllers {
-    private final GroupsRepository groupsRepository;
-
     @Autowired
-    public GroupsControllers(GroupsRepository groupsRepository) {
-        this.groupsRepository = groupsRepository;
-    }
+    public GroupsRepository groupsRepository;
 
     public GroupDto convertEntityToDto(GroupEntity entity) {
         if (entity == null) {

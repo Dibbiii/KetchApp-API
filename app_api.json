@@ -1,0 +1,59 @@
+{
+  "calendar": [
+    {
+      "title": "Dentist appointment",
+      "start_at": "09:00",
+      "end_at": "09:30"
+    },
+    {
+      "title": "Doctor appointment",
+      "start_at": "11:00",
+      "end_at": "12:00"
+    },
+    {
+      "title": "Meeting with client",
+      "start_at": "14:00",
+      "end_at": "15:00"
+    }
+  ],
+  "tomatoes": [
+    {
+      "title": "Integrals",
+      "start_at": "15:30",
+      "end_at": "16:20",
+      "pause_end_at": "16:30",
+      "subject": "Mathematics"
+    },
+    {
+      "title": "Romani",
+      "start_at": "16:30",
+      "end_at": "17:20",
+      "pause_end_at": "17:30",
+      "subject": "Storia"
+    },
+    {
+      "title": "Leopardi",
+      "start_at": "17:30",
+      "end_at": "18:20",
+      "pause_end_at": "18:30",
+      "subject": "Italiano"
+    }
+  ],
+  "rules": [
+    {
+      "title": "launch",
+      "start_at": "12:00",
+      "end_at": "13:00"
+    },
+    {
+      "title": "dinner",
+      "start_at": "20:00",
+      "end_at": "22:00"
+    },
+    {
+      "title": "sleep",
+      "start_at": "22:00",
+      "end_at": "08:00"
+    }
+  ]
+}

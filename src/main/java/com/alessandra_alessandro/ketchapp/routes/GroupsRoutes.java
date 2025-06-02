@@ -16,12 +16,8 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/groups")
 public class GroupsRoutes {
-    private final GroupsControllers groupsController;
-
     @Autowired
-    public GroupsRoutes(GroupsControllers groupsController) {
-        this.groupsController = groupsController;
-    }
+    public GroupsControllers groupsController;
 
     @Operation(summary = "Get all groups", description = "Fetches all groups from the database.")
     @ApiResponses(value = {

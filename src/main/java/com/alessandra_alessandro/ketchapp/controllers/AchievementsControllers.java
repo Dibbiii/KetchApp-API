@@ -62,9 +62,6 @@ public class AchievementsControllers {
             throw new IllegalArgumentException("Achievement data or user UUID cannot be null");
         }
         AchievementEntity achievementEntity = convertDtoToEntity(achievementDto);
-        if (achievementEntity == null) {
-            throw new IllegalArgumentException("AchievementEntity cannot be null");
-        }
         achievementEntity = achievementsRepository.save(achievementEntity);
         return convertEntityToDto(achievementEntity);
     }
