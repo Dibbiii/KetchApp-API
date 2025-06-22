@@ -21,13 +21,8 @@ import static org.springframework.data.jpa.domain.AbstractPersistable_.id;
 @RestController
 @RequestMapping("/api/achievements")
 public class AchievementsRoutes {
-
-    private final AchievementsControllers achievementsController;
-
     @Autowired
-    public AchievementsRoutes(AchievementsControllers achievementsController) {
-        this.achievementsController = achievementsController;
-    }
+    AchievementsControllers achievementsController;
 
     @Operation(summary = "Get all achievements", description = "Fetches all achievements from the database.")
     @ApiResponses(value = {
@@ -72,6 +67,7 @@ public class AchievementsRoutes {
             @ApiResponse(responseCode = "400", description = "Invalid input data"),
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
+    @PostMapping
     public ResponseEntity<AchievementDto> createAchievement(@RequestBody AchievementDto achievementDto) {
         try {
             AchievementDto createdAchievement = achievementsController.createAchievement(achievementDto);
