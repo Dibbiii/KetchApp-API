@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.List;
+import java.util.UUID;
 
 @Getter
 @Setter
@@ -13,12 +14,12 @@ import java.util.List;
 @AllArgsConstructor
 public class PlanBuilderResponseDto {
 
+    private UUID userUUID;
+
     private PlanBuilderResponseConfigDto config;
 
     private List<PlanBuilderResponseCalendarDto> calendar;
 
-    private List<PlanBuilderResponseTomatoesDto> tomatoes;
-
-    private List<PlanBuilderResponseRulesDto> rules;
+    private List<String> subjects;
 
 }

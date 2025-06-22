@@ -16,8 +16,6 @@ public class TomatoDto implements Serializable {
 
     private UUID userUUID;
 
-    private Integer groupId;
-
     private Timestamp startAt;
 
     private Timestamp endAt;

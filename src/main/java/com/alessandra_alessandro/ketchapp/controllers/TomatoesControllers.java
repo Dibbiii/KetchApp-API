@@ -1,8 +1,6 @@
 package com.alessandra_alessandro.ketchapp.controllers;
 
-import com.alessandra_alessandro.ketchapp.models.dto.GroupDto;
 import com.alessandra_alessandro.ketchapp.models.dto.TomatoDto;
-import com.alessandra_alessandro.ketchapp.models.entity.GroupEntity;
 import com.alessandra_alessandro.ketchapp.models.entity.TomatoEntity;
 import com.alessandra_alessandro.ketchapp.repositories.TomatoesRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,7 +12,7 @@ import java.util.stream.Collectors;
 
 @Service
 public class TomatoesControllers {
-    private final TomatoesRepository tomatoesRepository;
+    final TomatoesRepository tomatoesRepository;
 
     @Autowired
     public TomatoesControllers(TomatoesRepository tomatoesRepository) {
@@ -28,7 +26,6 @@ public class TomatoesControllers {
         return new TomatoDto(
                 entity.getId(),
                 entity.getUserUUID(),
-                entity.getGroupId(),
                 entity.getStartAt(),
                 entity.getEndAt(),
                 entity.getPauseEnd(),
@@ -44,7 +41,6 @@ public class TomatoesControllers {
         }
         return new TomatoEntity(
                 dto.getUserUUID(),
-                dto.getGroupId(),
                 dto.getStartAt(),
                 dto.getEndAt(),
                 dto.getPauseEnd(),

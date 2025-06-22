@@ -24,9 +24,6 @@ public class TomatoEntity {
     @Column(name = "user_uuid")
     private UUID userUUID;
 
-    @Column(name = "group_id")
-    private Integer groupId;
-
     @Column(name = "start_at")
     private Timestamp startAt;
 
@@ -44,9 +41,8 @@ public class TomatoEntity {
     @Column(name = "created_at")
     private Timestamp createdAt = new Timestamp(System.currentTimeMillis());
 
-    public TomatoEntity(UUID userUUID, Integer groupId, Timestamp startAt, Timestamp endAt, Timestamp pauseEnd, Integer nextTomatoId, String subject) {
+    public TomatoEntity(UUID userUUID, Timestamp startAt, Timestamp endAt, Timestamp pauseEnd, Integer nextTomatoId, String subject) {
         this.userUUID = userUUID;
-        this.groupId = groupId;
         this.startAt = startAt;
         this.endAt = endAt;
         this.pauseEnd = pauseEnd;

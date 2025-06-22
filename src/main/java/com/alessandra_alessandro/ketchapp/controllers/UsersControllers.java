@@ -113,7 +113,6 @@ public class UsersControllers {
                 .map(tomato -> new TomatoDto(
                         tomato.getId(),
                         tomato.getUserUUID(),
-                        tomato.getGroupId(),
                         tomato.getStartAt(),
                         tomato.getEndAt(),
                         tomato.getPauseEnd(),

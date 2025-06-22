@@ -30,7 +30,7 @@ public class PlanBuilderRoutes {
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
     @PostMapping
-    public ResponseEntity<PlanBuilderRequestDto> createPlanBuilder(@RequestBody PlanBuilderResponseDto planBuilderResponseDto) throws JsonProcessingException {
+    public ResponseEntity<PlanBuilderRequestDto> createPlanBuilder(@RequestBody PlanBuilderResponseDto planBuilderResponseDto) {
         return planBuilderControllers.createPlanBuilder(planBuilderResponseDto);
     }
 }

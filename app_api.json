@@ -3,10 +3,10 @@
     {
       "title": "Dentist appointment",
       "start_at": "09:00",
-      "end_at": "09:30"
+      "end_at": "10:00"
     },
     {
-      "title": "Doctor appointment",
+      "title": "Doctor's Appointmnet",
       "start_at": "11:00",
       "end_at": "12:00"
     },
@@ -20,22 +20,22 @@
     {
       "title": "Integrals",
       "start_at": "15:30",
-      "end_at": "16:20",
-      "pause_end_at": "16:30",
+      "end_at": "16:40",
+      "pause_end_at": "16:50",
       "subject": "Mathematics"
     },
     {
       "title": "Romani",
-      "start_at": "16:30",
-      "end_at": "17:20",
-      "pause_end_at": "17:30",
+      "start_at": "16:50",
+      "end_at": "18:00",
+      "pause_end_at": "18:10",
       "subject": "Storia"
     },
     {
       "title": "Leopardi",
-      "start_at": "17:30",
-      "end_at": "18:20",
-      "pause_end_at": "18:30",
+      "start_at": "18:10",
+      "end_at": "19:20",
+      "pause_end_at": "19:30",
       "subject": "Italiano"
     }
   ],
