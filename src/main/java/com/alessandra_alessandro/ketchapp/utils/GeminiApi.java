@@ -16,7 +16,7 @@ import java.net.http.HttpResponse;
 public class GeminiApi {
     public static final String BASE_URL = "https://generativelanguage.googleapis.com/v1beta/models/";
     public static final String API_KEY = System.getenv("GEMINI_API_KEY");
-    public static final String MODEL = "gemini-1.5-flash-latest";
+    public static final String MODEL = "gemini-2.5-flash";
     public static final String ENDPOINT = BASE_URL + MODEL + ":generateContent?key=" + API_KEY;
 
     private static final HttpClient HTTP_CLIENT = HttpClient.newHttpClient();
@@ -69,7 +69,7 @@ public class GeminiApi {
                         
                         Tieni un margine di 30 minuti prima e dopo ogni evento nel calendar.
                         
-                        Ritornami solo ed esclusivamente la struttura JSON richiesta.""",
+                        Ricordati che Start_at, End_at e Pause_end_at sono in formato ISO 8601 (YYYY-MM-DDTHH:MM:SSZ).""",
                 session, pause);
     }
 
@@ -88,6 +88,7 @@ public class GeminiApi {
 
         ObjectNode generationConfig = OBJECT_MAPPER.createObjectNode();
         generationConfig.put("responseMimeType", "application/json");
+        generationConfig.put("temperature", 1);
         generationConfig.set("responseSchema", buildResponseSchema());
 
         payload.set("contents", contentsArray);
@@ -108,12 +109,11 @@ public class GeminiApi {
 
         // TomatoItem schema
         ObjectNode tomatoItemProperties = OBJECT_MAPPER.createObjectNode();
-        tomatoItemProperties.set("title", createPropertySchema("string"));
         tomatoItemProperties.set("start_at", createPropertySchema("string"));
         tomatoItemProperties.set("end_at", createPropertySchema("string"));
         tomatoItemProperties.set("pause_end_at", createPropertySchema("string"));
         tomatoItemProperties.set("subject", createPropertySchema("string"));
-        ObjectNode tomatoItemSchema = createObjectSchema(tomatoItemProperties, "title", "start_at", "end_at", "pause_end_at", "subject");
+        ObjectNode tomatoItemSchema = createObjectSchema(tomatoItemProperties, "start_at", "end_at", "pause_end_at", "subject");
 
         // Main schema
         mainProperties.set("calendar", createArraySchema(calendarItemSchema));

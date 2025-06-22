@@ -9,7 +9,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -28,13 +30,11 @@ public class UsersControllers {
         if (entity == null) {
             return null;
         }
-        return new UserDto(
-                entity.getUuid(),
-                entity.getUsername(),
-                entity.getEmail(),
-                entity.getFirebaseUid(),
-                entity.getCreatedAt()
-        );
+        UserDto dto = new UserDto();
+        dto.setUuid(entity.getUuid());
+        dto.setUsername(entity.getUsername());
+        // Not setting totalTomatoes or totalHours here, as this is a simple converter
+        return dto;
     }
 
     private UserEntity convertDtoToEntity(UserDto dto) {
@@ -42,8 +42,7 @@ public class UsersControllers {
             return null;
         }
         return new UserEntity(
-                dto.getFirebaseUid(),
-                dto.getEmail(),
+                dto.getUuid(),
                 dto.getUsername()
         );
     }
@@ -74,9 +73,24 @@ public class UsersControllers {
 
     public List<UserDto> getUsers() {
         List<UserEntity> entities = usersRepository.findAll();
-        return entities.stream()
-                .map(this::convertEntityToDto)
-                .collect(Collectors.toList());
+        List<UserDto> users = new ArrayList<>();
+        for (UserEntity entity : entities) {
+            double totalHours = 0.0;
+            // Usa i nuovi metodi senza filtro data
+            List<String> subjects = usersRepository.findSubjectsByUuid(entity.getUuid());
+            for (String subject : subjects) {
+                Double subjectHours = usersRepository.findTotalHoursByUserAndSubject(entity.getUuid(), subject);
+                if (subjectHours != null) {
+                    totalHours += subjectHours;
+                }
+            }
+            UserDto userDto = new UserDto();
+            userDto.setUuid(entity.getUuid());
+            userDto.setUsername(entity.getUsername());
+            userDto.setTotalHours(totalHours);
+            users.add(userDto);
+        }
+        return users;
     }
 
     public UserDto getUser(UUID id) {
@@ -92,13 +106,13 @@ public class UsersControllers {
     }
 
     // Restituisce la mail dato l'username
-    public UserDto getEmailByUsername(String username) {
+    public String getEmailByUsername(String username) {
         if (username == null || username.isEmpty()) {
             throw new IllegalArgumentException("Username cannot be null or empty");
         }
         Optional<UserEntity> entityOptional = usersRepository.findByUsername(username);
         if (entityOptional.isPresent()) {
-            return convertEntityToDto(entityOptional.get());
+            return entityOptional.get().getEmail();
         } else {
             throw new IllegalArgumentException("User with username '" + username + "' not found.");
         }
@@ -183,33 +197,68 @@ public class UsersControllers {
     }
 
 
-    public StatisticsDto getUserStatistics(UUID uuid, LocalDate date) {
+    public UUID getUserUUIDByFirebaseUID(String firebaseUID) {
+        if (firebaseUID == null || firebaseUID.isEmpty()) {
+            throw new IllegalArgumentException("Firebase UID cannot be null or empty");
+        }
+        Optional<UserEntity> entityOptional = usersRepository.findByFirebaseUid(firebaseUID);
+        if (entityOptional.isPresent()) {
+            return entityOptional.get().getUuid();
+        } else {
+            throw new IllegalArgumentException("User with Firebase UID '" + firebaseUID + "' not found.");
+        }
+    }
+
+    public StatisticsDto getUserStatistics(UUID uuid, LocalDate startDate, LocalDate endDate) {
         if (uuid == null) {
             throw new IllegalArgumentException("UUID cannot be null");
         }
-        if (date == null) {
-            throw new IllegalArgumentException("Date cannot be null");
+        if (startDate == null || endDate == null) {
+            throw new IllegalArgumentException("Start date and end date cannot be null");
         }
-        List<LocalDate> weekDates = new ArrayList<>(); // TODO: Simplify
-        for (int i = 0; i < 7; i++) {
-            weekDates.add(date.minusDays(i));
+        if (endDate.isBefore(startDate)) {
+            throw new IllegalArgumentException("End date cannot be before start date");
         }
-
+        List<LocalDate> rangeDates = new ArrayList<>();
+        LocalDate current = startDate;
+        while (!current.isAfter(endDate)) {
+            rangeDates.add(current);
+            current = current.plusDays(1);
+        }
         List<StatisticsDateDto> statisticsDates = new ArrayList<>();
-        for (LocalDate weekDate : weekDates) {
-            List<String> subjects = usersRepository.findSubjectsByUuidAndDate(uuid, weekDate.toString());
+        for (LocalDate date : rangeDates) {
+            List<String> subjects = usersRepository.findSubjectsByUuidAndDate(uuid, date.toString());
             List<StatisticsSubjectDto> statisticsSubjects = new ArrayList<>();
             for (String subject : subjects) {
-                Double totalHours = usersRepository.findTotalHoursByUserAndSubjectAndDate(uuid, subject, weekDate.toString());
+                Double totalHours = usersRepository.findTotalHoursByUserAndSubjectAndDate(uuid, subject, date.toString());
                 statisticsSubjects.add(new StatisticsSubjectDto(subject, totalHours));
             }
             statisticsDates.add(new StatisticsDateDto(
-                    weekDate,
+                    date,
                     statisticsSubjects.stream().mapToDouble(StatisticsSubjectDto::getHours).sum(),
                     statisticsSubjects));
         }
         StatisticsDto statisticsDto = new StatisticsDto();
         statisticsDto.setDates(statisticsDates);
         return statisticsDto;
+    }
+
+    public List<TomatoDto> getTodaysTomatoes(UUID uuid) {
+        if (uuid == null) {
+            throw new IllegalArgumentException("UUID cannot be null");
+        }
+        LocalDate today = LocalDate.now();
+        List<TomatoEntity> tomatoes = usersRepository.findTomatoesByUuidAndDate(uuid, today.toString());
+        return tomatoes.stream()
+                .map(tomato -> new TomatoDto(
+                        tomato.getId(),
+                        tomato.getUserUUID(),
+                        tomato.getStartAt(),
+                        tomato.getEndAt(),
+                        tomato.getPauseEnd(),
+                        tomato.getNextTomatoId(),
+                        tomato.getSubject(),
+                        tomato.getCreatedAt()
+                )).collect(Collectors.toList());
     }
 }

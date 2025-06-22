@@ -121,12 +121,12 @@ public class UsersRoutes {
             @ApiResponse(responseCode = "404", description = "Username not found"),
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
-    @GetMapping("/email/{username}") // TODO: Implementare questo nel getUser e mettere dei ?filter
-    public ResponseEntity<UserDto> getEmailByUsername(@PathVariable String username) {
+    @GetMapping("/email/{username}")
+    public ResponseEntity<String> getEmailByUsername(@PathVariable String username) {
         try {
-            UserDto email = usersController.getEmailByUsername(username);
-            if (email != null) {
-                return ResponseEntity.ok(email);
+            String response = usersController.getEmailByUsername(username);
+            if (response != null) {
+                return ResponseEntity.ok(response);
             } else {
                 return ResponseEntity.notFound().build();
             }
@@ -253,7 +253,7 @@ public class UsersRoutes {
         }
     }
 
-    @Operation(summary = "Get statistics by user UUID", description = "Fetches statistics for a specific user by their UUID.")
+    @Operation(summary = "Get statistics by user UUID", description = "Fetches statistics for a specific user by their UUID and a date range.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successfully retrieved statistics for user",
                     content = @Content(mediaType = "application/json",
@@ -263,11 +263,60 @@ public class UsersRoutes {
     })
     @GetMapping("/{uuid}/statistics")
     public ResponseEntity<StatisticsDto> getUserStatistics(@PathVariable UUID uuid,
-                                                           @RequestParam(required = true) LocalDate date) {
+                                                           @RequestParam(required = true) LocalDate startDate,
+                                                           @RequestParam(required = true) LocalDate endDate) {
         try {
-            StatisticsDto statistics = usersController.getUserStatistics(uuid, date);
+            StatisticsDto statistics = usersController.getUserStatistics(uuid, startDate, endDate);
             if (statistics != null) {
                 return ResponseEntity.ok(statistics);
+            } else {
+                return ResponseEntity.notFound().build();
+            }
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().build();
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    @Operation(summary = "Get user UUID by Firebase UID", description = "Fetches the UUID of a user by their Firebase UID.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully retrieved user UUID",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = Map.class))),
+            @ApiResponse(responseCode = "404", description = "User not found"),
+            @ApiResponse(responseCode = "500", description = "Internal server error")
+    })
+    @GetMapping("/firebase/{firebaseUID}")
+    public ResponseEntity<Map<String, UUID>> getUserUUIDByFirebaseUID(@PathVariable String firebaseUID) {
+        try {
+            UUID userUUID = usersController.getUserUUIDByFirebaseUID(firebaseUID);
+            if (userUUID != null) {
+                return ResponseEntity.ok(Collections.singletonMap("uuid", userUUID));
+            } else {
+                return ResponseEntity.notFound().build();
+            }
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().build();
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    @Operation(summary = "Get Today's Tomatoes by User UUID", description = "Fetches a list of today's tomatoes for a specific user by their UUID.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully retrieved today's tomatoes for user",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = TomatoDto.class))),
+            @ApiResponse(responseCode = "404", description = "User not found"),
+            @ApiResponse(responseCode = "500", description = "Internal server error")
+    })
+    @GetMapping("/{uuid}/tomatoes/today")
+    public ResponseEntity<List<TomatoDto>> getTodaysTomatoes(@PathVariable UUID uuid) {
+        try {
+            List<TomatoDto> todaysTomatoes = usersController.getTodaysTomatoes(uuid);
+            if (todaysTomatoes != null) {
+                return ResponseEntity.ok(todaysTomatoes);
             } else {
                 return ResponseEntity.notFound().build();
             }

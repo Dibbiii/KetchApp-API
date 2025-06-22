@@ -6,7 +6,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.sql.Timestamp;
-import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Getter
@@ -19,9 +18,5 @@ public class UserDto {
 
     private String username;
 
-    private String email;
-
-    private String firebaseUid;
-
-    private Timestamp createdAt;
+    private Double totalHours;
 }

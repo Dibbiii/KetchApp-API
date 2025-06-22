@@ -40,4 +40,9 @@ public class UserEntity {
         this.firebaseUid = firebaseUid;
         this.username = username;
     }
+
+    public UserEntity(UUID uuid, String username) {
+        this.uuid = uuid;
+        this.username = username;
+    }
 }

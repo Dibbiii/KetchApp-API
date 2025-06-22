@@ -11,8 +11,6 @@ import lombok.Setter;
 @NoArgsConstructor
 public class PlanBuilderRequestTomatoesDto {
 
-    private String title;
-
     private String start_at;
 
     private String end_at;
