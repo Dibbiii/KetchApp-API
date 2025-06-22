@@ -31,7 +31,7 @@ public class GeminiApi {
 
         String session = getSessionFromDto(dto);
         String pause = getPauseFromDto(dto);
-        String question = buildQuestion(session, pause);
+        String question = buildQuestion(session, pause, dto);
 
         try {
             String dtoJson = OBJECT_MAPPER.writeValueAsString(dto);
@@ -60,17 +60,26 @@ public class GeminiApi {
         return dto.getConfig() != null && dto.getConfig().getPause() != null ? dto.getConfig().getPause() : "N/A";
     }
 
-    private static String buildQuestion(String session, String pause) {
+    private static String buildQuestion(String session, String pause, PlanBuilderResponseDto dto) {
+        StringBuilder subjectsInfo = new StringBuilder();
+        if (dto.getSubjects() != null && !dto.getSubjects().isEmpty()) {
+            subjectsInfo.append("Le materie da studiare sono:\n");
+            for (var subject : dto.getSubjects()) {
+                subjectsInfo.append("- ")
+                        .append(subject.getName())
+                        .append(": ")
+                        .append(subject.getDuration())
+                        .append(" minuti\n");
+            }
+        }
         return String.format("""
-                        
                         Osserva gli eventi che hai nel calendar e basandoti su quelli creami un piano di studio che mi permetta di studiare senza sovrapporsi agli impegni che ho.
                         
+                        %s
                         La durata di ogni sessione di studio dura %s e la pausa %s.
-                        
                         Tieni un margine di 30 minuti prima e dopo ogni evento nel calendar.
-                        
                         Ricordati che Start_at, End_at e Pause_end_at sono in formato ISO 8601 (YYYY-MM-DDTHH:MM:SSZ).""",
-                session, pause);
+                subjectsInfo, session, pause);
     }
 
     private static String buildGeminiPayload(String dtoJson, String question) throws JsonProcessingException {

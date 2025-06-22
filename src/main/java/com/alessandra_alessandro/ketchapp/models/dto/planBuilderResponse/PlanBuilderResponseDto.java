@@ -20,6 +20,6 @@ public class PlanBuilderResponseDto {
 
     private List<PlanBuilderResponseCalendarDto> calendar;
 
-    private List<String> subjects;
+    private List<PlanBuilderResponseSubjectsDto> subjects;
 
 }

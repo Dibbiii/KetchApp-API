@@ -231,7 +231,7 @@ public class UsersControllers {
             List<StatisticsSubjectDto> statisticsSubjects = new ArrayList<>();
             for (String subject : subjects) {
                 Double totalHours = usersRepository.findTotalHoursByUserAndSubjectAndDate(uuid, subject, date.toString());
-                statisticsSubjects.add(new StatisticsSubjectDto(subject, totalHours));
+                statisticsSubjects.add(new StatisticsSubjectDto(subject, totalHours != null ? totalHours : 0.0));
             }
             statisticsDates.add(new StatisticsDateDto(
                     date,
