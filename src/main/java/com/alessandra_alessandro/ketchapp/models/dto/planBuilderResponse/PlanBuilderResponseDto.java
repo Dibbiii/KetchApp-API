@@ -16,7 +16,9 @@ public class PlanBuilderResponseDto {
 
     private UUID userUUID;
 
-    private PlanBuilderResponseConfigDto config;
+    private String session;
+
+    private String breakDuration;
 
     private List<PlanBuilderResponseCalendarDto> calendar;
 

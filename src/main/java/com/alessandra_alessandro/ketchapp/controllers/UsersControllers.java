@@ -9,9 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -136,6 +134,25 @@ public class UsersControllers {
                 )).collect(Collectors.toList());
     }
 
+    public List<TomatoDto> getUserTomatoes(UUID uuid, LocalDate date) {
+        if (uuid == null) {
+            throw new IllegalArgumentException("UUID cannot be null");
+        }
+        List<TomatoEntity> tomatoes = usersRepository.findTomatoesByUuid(uuid);
+        return tomatoes.stream()
+                .filter(tomato -> date == null || !tomato.getCreatedAt().toLocalDateTime().toLocalDate().isBefore(date))
+                .map(tomato -> new TomatoDto(
+                        tomato.getId(),
+                        tomato.getUserUUID(),
+                        tomato.getStartAt(),
+                        tomato.getEndAt(),
+                        tomato.getPauseEnd(),
+                        tomato.getNextTomatoId(),
+                        tomato.getSubject(),
+                        tomato.getCreatedAt()
+                )).collect(Collectors.toList());
+    }
+
     public List<ActivityDto> getUserActivities(UUID uuid) {
         if (uuid == null) {
             throw new IllegalArgumentException("UUID cannot be null");
@@ -161,7 +178,8 @@ public class UsersControllers {
                 .map(achievement -> new AchievementDto(
                         achievement.getId(),
                         achievement.getUserUUID(),
-                        achievement.getAchievementNumber(),
+                        achievement.getDescription(),
+                        achievement.getCompleted(),
                         achievement.getCreatedAt()
                 )).collect(Collectors.toList());
     }
@@ -241,24 +259,5 @@ public class UsersControllers {
         StatisticsDto statisticsDto = new StatisticsDto();
         statisticsDto.setDates(statisticsDates);
         return statisticsDto;
-    }
-
-    public List<TomatoDto> getTodaysTomatoes(UUID uuid) {
-        if (uuid == null) {
-            throw new IllegalArgumentException("UUID cannot be null");
-        }
-        LocalDate today = LocalDate.now();
-        List<TomatoEntity> tomatoes = usersRepository.findTomatoesByUuidAndDate(uuid, today.toString());
-        return tomatoes.stream()
-                .map(tomato -> new TomatoDto(
-                        tomato.getId(),
-                        tomato.getUserUUID(),
-                        tomato.getStartAt(),
-                        tomato.getEndAt(),
-                        tomato.getPauseEnd(),
-                        tomato.getNextTomatoId(),
-                        tomato.getSubject(),
-                        tomato.getCreatedAt()
-                )).collect(Collectors.toList());
     }
 }

@@ -15,5 +15,5 @@ public class PlanBuilderRequestDto {
 
     private List<PlanBuilderRequestCalendarDto> calendar;
 
-    private List<PlanBuilderRequestTomatoesDto> tomatoes;
+    private List<PlanBuilderRequestSubjectsDto> subjects;
 }

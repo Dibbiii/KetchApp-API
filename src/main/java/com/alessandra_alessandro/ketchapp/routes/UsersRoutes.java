@@ -137,7 +137,7 @@ public class UsersRoutes {
         }
     }
 
-    @Operation(summary = "Get tomatoes by user UUID", description = "Fetches a list of tomatoes for a specific user by their UUID.")
+    @Operation(summary = "Get tomatoes by user UUID", description = "Fetches a list of tomatoes for a specific user by their UUID. Optionally filter by date (yyyy-MM-dd) with ?date=")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successfully retrieved tomatoes for user",
                     content = @Content(mediaType = "application/json",
@@ -146,9 +146,12 @@ public class UsersRoutes {
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
     @GetMapping("/{uuid}/tomatoes")
-    public ResponseEntity<List<TomatoDto>> getUserTomatoes(@PathVariable UUID uuid) {
+    public ResponseEntity<List<TomatoDto>> getUserTomatoes(@PathVariable UUID uuid,
+                                                           @RequestParam(value = "date", required = false) LocalDate date) {
         try {
-            List<TomatoDto> tomatoes = usersController.getUserTomatoes(uuid);
+            List<TomatoDto> tomatoes = (date == null)
+                    ? usersController.getUserTomatoes(uuid)
+                    : usersController.getUserTomatoes(uuid, date);
             return ResponseEntity.ok(tomatoes);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().build();
@@ -293,30 +296,6 @@ public class UsersRoutes {
             UUID userUUID = usersController.getUserUUIDByFirebaseUID(firebaseUID);
             if (userUUID != null) {
                 return ResponseEntity.ok(Collections.singletonMap("uuid", userUUID));
-            } else {
-                return ResponseEntity.notFound().build();
-            }
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().build();
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-        }
-    }
-
-    @Operation(summary = "Get Today's Tomatoes by User UUID", description = "Fetches a list of today's tomatoes for a specific user by their UUID.")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Successfully retrieved today's tomatoes for user",
-                    content = @Content(mediaType = "application/json",
-                            schema = @Schema(implementation = TomatoDto.class))),
-            @ApiResponse(responseCode = "404", description = "User not found"),
-            @ApiResponse(responseCode = "500", description = "Internal server error")
-    })
-    @GetMapping("/{uuid}/tomatoes/today")
-    public ResponseEntity<List<TomatoDto>> getTodaysTomatoes(@PathVariable UUID uuid) {
-        try {
-            List<TomatoDto> todaysTomatoes = usersController.getTodaysTomatoes(uuid);
-            if (todaysTomatoes != null) {
-                return ResponseEntity.ok(todaysTomatoes);
             } else {
                 return ResponseEntity.notFound().build();
             }

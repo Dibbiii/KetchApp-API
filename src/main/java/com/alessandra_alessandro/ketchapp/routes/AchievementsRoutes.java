@@ -45,10 +45,10 @@ public class AchievementsRoutes {
             @ApiResponse(responseCode = "404", description = "Achievement not found"),
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
-    @GetMapping("/{id}")
-    public ResponseEntity<AchievementDto> getAchievement(@PathVariable Integer id) {
+    @GetMapping("/{uuid}")
+    public ResponseEntity<AchievementDto> getAchievement(@PathVariable UUID uuid) {
         try {
-            AchievementDto achievement = achievementsController.getAchievement(id);
+            AchievementDto achievement = achievementsController.getAchievement(uuid);
             if (achievement != null) {
                 return ResponseEntity.ok(achievement);
             } else {

@@ -1,59 +1,32 @@
 {
-  "config": {
-    "notifications": {
-      "enabled": true,
-      "sound": "default",
-      "vibration": true
-    },
-    "session": "20m",
-    "pause": "10m"
-  },
+  "user_uuid": "{uuid: 9f8fa0f6-1249-4708-8c86-42a421e0eb28}",
+  "session": "15 m",
+  "breakDuration": "5 m",
   "calendar": [
     {
-      "start_at": "09:00",
-      "end_at": "10:00",
-      "title": "Dentist appointment"
+      "start_at": "12:30",
+      "end_at": "13:30",
+      "title": "Lunch"
     },
     {
-      "start_at": "11:00",
-      "end_at": "12:00",
-      "title": "Doctor's Appointmnet"
+      "start_at": "19:30",
+      "end_at": "20:30",
+      "title": "Dinner"
     },
     {
-      "start_at": "14:00",
-      "end_at": "15:00",
-      "title": "Meeting with client"
+      "start_at": "23:30",
+      "end_at": "07:30",
+      "title": "Sleep"
     }
   ],
-  "tomatoes": [
+  "subjects": [
     {
-      "title": "Integrals",
-      "subject": "Mathematics"
+      "name": "matematica ",
+      "duration": "1h 00m"
     },
     {
-      "title": "Romani",
-      "subject": "Storia"
-    },
-    {
-      "title": "Leopardi",
-      "subject": "Italiano"
-    }
-  ],
-  "rules": [
-    {
-      "title": "launch",
-      "start_at": "12:00",
-      "end_at": "13:00"
-    },
-    {
-      "title": "dinner",
-      "start_at": "20:00",
-      "end_at": "22:00"
-    },
-    {
-      "title": "sleep",
-      "start_at": "22:00",
-      "end_at": "08:00"
+      "name": "storia",
+      "duration": "30 m"
     }
   ]
 }

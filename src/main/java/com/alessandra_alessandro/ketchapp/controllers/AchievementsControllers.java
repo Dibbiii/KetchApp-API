@@ -3,20 +3,24 @@ package com.alessandra_alessandro.ketchapp.controllers;
 import com.alessandra_alessandro.ketchapp.models.dto.AchievementDto;
 import com.alessandra_alessandro.ketchapp.models.entity.AchievementEntity;
 import com.alessandra_alessandro.ketchapp.repositories.AchievementsRepository;
+import com.alessandra_alessandro.ketchapp.repositories.UsersRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
 public class AchievementsControllers {
     private final AchievementsRepository achievementsRepository;
+    private final UsersRepository usersRepository;
 
     @Autowired
-    public AchievementsControllers(AchievementsRepository achievementsRepository) {
+    public AchievementsControllers(AchievementsRepository achievementsRepository, UsersRepository usersRepository) {
         this.achievementsRepository = achievementsRepository;
+        this.usersRepository = usersRepository;
     }
 
     private AchievementDto convertEntityToDto(AchievementEntity entity) {
@@ -26,7 +30,8 @@ public class AchievementsControllers {
         return new AchievementDto(
                 entity.getId(),
                 entity.getUserUUID(),
-                entity.getAchievementNumber(),
+                entity.getDescription(),
+                entity.getCompleted(),
                 entity.getCreatedAt()
         );
     }
@@ -35,7 +40,7 @@ public class AchievementsControllers {
         if (dto == null) {
             return null;
         }
-        return new AchievementEntity(dto.getUserUUID(), dto.getAchievementNumber());
+        return new AchievementEntity(dto.getUserUUID(), dto.getDescription(), dto.getCompleted());
     }
 
     public List<AchievementDto> getAchievements() {
@@ -45,15 +50,40 @@ public class AchievementsControllers {
                 .collect(Collectors.toList());
     }
 
-    public AchievementDto getAchievement(Integer id) {
-        if (id == null) {
+    public AchievementDto getAchievement(UUID uuid) {
+        if (uuid == null) {
             throw new IllegalArgumentException("ID cannot be null");
         }
-        Optional<AchievementEntity> achievement = achievementsRepository.findById(id);
+        // * Find the achievement by user UUID
+        Optional<AchievementEntity> achievement = achievementsRepository.findByUserUUID(uuid);
+
+        // * Check if User Studied for 5 hours "Studied for 5 hours"
+        Double totalHours = usersRepository.findTotalHoursByUserUUID(uuid);
+        boolean hasStudiedFor5Hours = totalHours != null && totalHours >= 5.0;
+        // If Achievement with the description "Studied for 5 hours" exists, update it
+        // If not, create a new one
+        if (hasStudiedFor5Hours) {
+            AchievementEntity achievementEntity = achievement.orElseGet(() -> new AchievementEntity(uuid, "Studied for 5 hours", true));
+            achievementEntity.setCompleted(true);
+            achievementsRepository.save(achievementEntity);
+            return convertEntityToDto(achievementEntity);
+        }
+
+        // * Check if User Completed 10 Tomatoes "Completed 10 Tomatoes"
+        boolean hasCompleted10Tomatoes = usersRepository.countTomatoesByUserUUID(uuid) >= 10;
+        // If Achievement with the description "Completed 10 Tomatoes" exists, update it
+        // If not, create a new one
+        if (hasCompleted10Tomatoes) {
+            AchievementEntity achievementEntity = achievement.orElseGet(() -> new AchievementEntity(uuid, "Completed 10 Tomatoes", true));
+            achievementEntity.setCompleted(true);
+            achievementsRepository.save(achievementEntity);
+            return convertEntityToDto(achievementEntity);
+        }
+
         if (achievement.isPresent()) {
             return convertEntityToDto(achievement.get());
         } else {
-            throw new IllegalArgumentException("Achievement not found with ID: " + id);
+            throw new IllegalArgumentException("Achievement not found with ID: " + uuid);
         }
     }
 

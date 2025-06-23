@@ -71,8 +71,22 @@ public interface UsersRepository extends JpaRepository<UserEntity, UUID> {
 
     Optional<UserEntity> findByFirebaseUid(String firebaseUid);
 
+    @Query(value = """
+            SELECT SUM(EXTRACT(EPOCH FROM (a_stop.created_at - a_start.created_at))) / 3600.0 AS total_hours
+            FROM Activities a_start JOIN Activities a_stop ON a_start.tomato_id = a_stop.tomato_id
+            WHERE a_start.user_uuid = :userUUID
+              AND a_start.type = 'TIMER'
+              AND a_start.action = 'START'
+              AND a_stop.type = 'TIMER'
+              AND a_stop.action = 'STOP'
+            """, nativeQuery = true)
+    Double findTotalHoursByUserUUID(@Param("userUUID") UUID userUUID);
+
     Optional<UserEntity> findByEmail(String email);
 
     @Query("SELECT t FROM TomatoEntity t WHERE t.userUUID = :userUUID AND FUNCTION('DATE', t.createdAt) = CAST(:date AS date)")
     List<TomatoEntity> findTomatoesByUuidAndDate(@Param("userUUID") UUID userUUID, @Param("date") String date);
+
+    @Query("SELECT COUNT(t) FROM TomatoEntity t WHERE t.userUUID = :userUUID")
+    long countTomatoesByUserUUID(@Param("userUUID") UUID userUUID);
 }

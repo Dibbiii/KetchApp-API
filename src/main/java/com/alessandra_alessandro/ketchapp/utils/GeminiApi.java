@@ -12,6 +12,7 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.time.LocalDate;
 
 public class GeminiApi {
     public static final String BASE_URL = "https://generativelanguage.googleapis.com/v1beta/models/";
@@ -53,11 +54,11 @@ public class GeminiApi {
     }
 
     private static String getSessionFromDto(PlanBuilderResponseDto dto) {
-        return dto.getConfig() != null && dto.getConfig().getSession() != null ? dto.getConfig().getSession() : "N/A";
+        return dto.getSession() != null ? dto.getSession() : "N/A";
     }
 
     private static String getPauseFromDto(PlanBuilderResponseDto dto) {
-        return dto.getConfig() != null && dto.getConfig().getPause() != null ? dto.getConfig().getPause() : "N/A";
+        return dto.getBreakDuration() != null ? dto.getBreakDuration() : "N/A";
     }
 
     private static String buildQuestion(String session, String pause, PlanBuilderResponseDto dto) {
@@ -67,19 +68,21 @@ public class GeminiApi {
             for (var subject : dto.getSubjects()) {
                 subjectsInfo.append("- ")
                         .append(subject.getName())
-                        .append(": ")
-                        .append(subject.getDuration())
-                        .append(" minuti\n");
+                        .append("\n");
             }
         }
         return String.format("""
+                        La data di oggi è %s.
                         Osserva gli eventi che hai nel calendar e basandoti su quelli creami un piano di studio che mi permetta di studiare senza sovrapporsi agli impegni che ho.
                         
-                        %s
+                        Oggi é: %s
                         La durata di ogni sessione di studio dura %s e la pausa %s.
                         Tieni un margine di 30 minuti prima e dopo ogni evento nel calendar.
                         Ricordati che Start_at, End_at e Pause_end_at sono in formato ISO 8601 (YYYY-MM-DDTHH:MM:SSZ).""",
-                subjectsInfo, session, pause);
+                LocalDate.now(), // Aggiunto: la data di oggi
+                subjectsInfo,
+                session,
+                pause);
     }
 
     private static String buildGeminiPayload(String dtoJson, String question) throws JsonProcessingException {
@@ -116,19 +119,24 @@ public class GeminiApi {
         calendarItemProperties.set("end_at", createPropertySchema("string"));
         ObjectNode calendarItemSchema = createObjectSchema(calendarItemProperties, "title", "start_at", "end_at");
 
-        // TomatoItem schema
+        // TomatoItem schema (for inside subjects)
         ObjectNode tomatoItemProperties = OBJECT_MAPPER.createObjectNode();
         tomatoItemProperties.set("start_at", createPropertySchema("string"));
         tomatoItemProperties.set("end_at", createPropertySchema("string"));
         tomatoItemProperties.set("pause_end_at", createPropertySchema("string"));
-        tomatoItemProperties.set("subject", createPropertySchema("string"));
-        ObjectNode tomatoItemSchema = createObjectSchema(tomatoItemProperties, "start_at", "end_at", "pause_end_at", "subject");
+        ObjectNode tomatoItemSchema = createObjectSchema(tomatoItemProperties, "start_at", "end_at", "pause_end_at");
+
+        // SubjectItem schema
+        ObjectNode subjectItemProperties = OBJECT_MAPPER.createObjectNode();
+        subjectItemProperties.set("name", createPropertySchema("string"));
+        subjectItemProperties.set("tomatoes", createArraySchema(tomatoItemSchema));
+        ObjectNode subjectItemSchema = createObjectSchema(subjectItemProperties, "name", "tomatoes");
 
         // Main schema
         mainProperties.set("calendar", createArraySchema(calendarItemSchema));
-        mainProperties.set("tomatoes", createArraySchema(tomatoItemSchema));
+        mainProperties.set("subjects", createArraySchema(subjectItemSchema));
 
-        return createObjectSchema(mainProperties, "calendar", "tomatoes");
+        return createObjectSchema(mainProperties, "calendar", "subjects");
     }
 
     private static ObjectNode createPropertySchema(String type) {

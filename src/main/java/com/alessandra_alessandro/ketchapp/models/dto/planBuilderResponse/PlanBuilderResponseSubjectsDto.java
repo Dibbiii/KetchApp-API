@@ -1,5 +1,7 @@
 package com.alessandra_alessandro.ketchapp.models.dto.planBuilderResponse;
 
+import java.util.List;
+
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -13,6 +15,7 @@ public class PlanBuilderResponseSubjectsDto {
 
     private String name;
 
-    private Integer duration;
+    private String duration;
 
 }
+

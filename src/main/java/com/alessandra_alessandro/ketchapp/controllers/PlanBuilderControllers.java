@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.alessandra_alessandro.ketchapp.models.entity.TomatoEntity;
+import com.alessandra_alessandro.ketchapp.repositories.TomatoesRepository;
 
 import java.sql.Timestamp;
 import java.time.Instant;
@@ -19,10 +20,12 @@ import java.util.List;
 @Service
 public class PlanBuilderControllers {
     private final TomatoesControllers tomatoesControllers;
+    private final TomatoesRepository tomatoesRepository;
 
     @Autowired
-    public PlanBuilderControllers(TomatoesControllers tomatoesControllers) {
+    public PlanBuilderControllers(TomatoesControllers tomatoesControllers, TomatoesRepository tomatoesRepository) {
         this.tomatoesControllers = tomatoesControllers;
+        this.tomatoesRepository = tomatoesRepository;
     }
 
     public ResponseEntity<PlanBuilderRequestDto> createPlanBuilder(PlanBuilderResponseDto dto) {
@@ -32,15 +35,31 @@ public class PlanBuilderControllers {
         }
 
         // Process the response to create TomatoEntity objects
-        List<PlanBuilderRequestTomatoesDto> tomatoDtos = geminiResponse.getTomatoes();
-        for (PlanBuilderRequestTomatoesDto tomatoDto : tomatoDtos) {
-            TomatoEntity tomatoEntity = new TomatoEntity();
-            tomatoEntity.setSubject(tomatoDto.getSubject());
-            tomatoEntity.setStartAt(parseIsoToTimestamp(tomatoDto.getStart_at()));
-            tomatoEntity.setEndAt(parseIsoToTimestamp(tomatoDto.getEnd_at()));
-            tomatoEntity.setPauseEnd(parseIsoToTimestamp(tomatoDto.getPause_end_at()));
+        if (geminiResponse.getSubjects() != null) {
+            for (var subject : geminiResponse.getSubjects()) {
+                if (subject.getTomatoes() != null) {
+                    TomatoEntity prevTomato = null;
+                    for (var tomato : subject.getTomatoes()) {
+                        TomatoEntity tomatoEntity = new TomatoEntity();
+                        tomatoEntity.setId(null); // Lascia che il DB generi l'id
+                        tomatoEntity.setSubject(subject.getName());
+                        tomatoEntity.setUserUUID(dto.getUserUUID()); // Usa il parametro passato
+                        tomatoEntity.setStartAt(parseIsoToTimestamp(tomato.getStart_at()));
+                        tomatoEntity.setEndAt(parseIsoToTimestamp(tomato.getEnd_at()));
+                        tomatoEntity.setPauseEnd(parseIsoToTimestamp(tomato.getPause_end_at()));
+                        // Salva tomatoEntity nel database
+                        TomatoEntity savedTomato = tomatoesRepository.save(tomatoEntity);
+                        // Se c'è un tomato precedente, aggiorna il suo next_tomato_id
+                        if (prevTomato != null) {
+                            prevTomato.setNextTomatoId(savedTomato.getId());
+                            tomatoesRepository.save(prevTomato);
+                        }
+                        // Usa sempre l'istanza persistente per evitare duplicati
+                        prevTomato = savedTomato;
+                    }
+                }
+            }
         }
-        // Save the TomatoEntity objects to the database
 
         return ResponseEntity.ok(geminiResponse);
     }

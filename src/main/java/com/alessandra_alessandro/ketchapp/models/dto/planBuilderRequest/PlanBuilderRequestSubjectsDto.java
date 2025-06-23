@@ -5,16 +5,14 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.List;
+
 @Getter
 @Setter
-@AllArgsConstructor
 @NoArgsConstructor
-public class PlanBuilderRequestTomatoesDto {
-
-    private String start_at;
-
-    private String end_at;
-
-    private String pause_end_at;
-
+@AllArgsConstructor
+public class PlanBuilderRequestSubjectsDto {
+    private String name;
+    private List<PlanBuilderRequestTomatoesDto> tomatoes;
 }
+
