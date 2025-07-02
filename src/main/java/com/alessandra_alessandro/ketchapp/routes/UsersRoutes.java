@@ -266,8 +266,8 @@ public class UsersRoutes {
     })
     @GetMapping("/{uuid}/statistics")
     public ResponseEntity<StatisticsDto> getUserStatistics(@PathVariable UUID uuid,
-                                                           @RequestParam(required = true) LocalDate startDate,
-                                                           @RequestParam(required = true) LocalDate endDate) {
+                                                           @RequestParam LocalDate startDate,
+                                                           @RequestParam LocalDate endDate) {
         try {
             StatisticsDto statistics = usersController.getUserStatistics(uuid, startDate, endDate);
             if (statistics != null) {
@@ -286,16 +286,16 @@ public class UsersRoutes {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successfully retrieved user UUID",
                     content = @Content(mediaType = "application/json",
-                            schema = @Schema(implementation = Map.class))),
+                            schema = @Schema(implementation = String.class))),
             @ApiResponse(responseCode = "404", description = "User not found"),
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
     @GetMapping("/firebase/{firebaseUID}")
-    public ResponseEntity<Map<String, UUID>> getUserUUIDByFirebaseUID(@PathVariable String firebaseUID) {
+    public ResponseEntity<String> getUserUUIDByFirebaseUID(@PathVariable String firebaseUID) {
         try {
             UUID userUUID = usersController.getUserUUIDByFirebaseUID(firebaseUID);
             if (userUUID != null) {
-                return ResponseEntity.ok(Collections.singletonMap("uuid", userUUID));
+                return ResponseEntity.ok(userUUID.toString());
             } else {
                 return ResponseEntity.notFound().build();
             }

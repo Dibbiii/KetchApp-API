@@ -1,6 +1,7 @@
 package com.alessandra_alessandro.ketchapp.routes;
 
 import com.alessandra_alessandro.ketchapp.controllers.TomatoesControllers;
+import com.alessandra_alessandro.ketchapp.models.dto.ActivityDto;
 import com.alessandra_alessandro.ketchapp.models.dto.TomatoDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -93,6 +94,28 @@ public class TomatoesRoutes {
             TomatoDto deletedTomato = tomatoesController.deleteTomato(id);
             if (deletedTomato != null) {
                 return ResponseEntity.ok().build();
+            } else {
+                return ResponseEntity.notFound().build();
+            }
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().build();
+        }
+    }
+
+    @Operation(summary = "Get all activities for a tomato", description = "Fetches all activities related to a specific tomato by its id.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully retrieved activities",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = ActivityDto.class))),
+            @ApiResponse(responseCode = "404", description = "Tomato or activities not found"),
+            @ApiResponse(responseCode = "500", description = "Internal server error")
+    })
+    @GetMapping("/{id}/activities")
+    public ResponseEntity<List<ActivityDto>> getActivitiesByTomatoId(@PathVariable Integer id) {
+        try {
+            List<ActivityDto> activities = tomatoesController.getActivitiesByTomatoId(id);
+            if (activities != null) {
+                return ResponseEntity.ok(activities);
             } else {
                 return ResponseEntity.notFound().build();
             }

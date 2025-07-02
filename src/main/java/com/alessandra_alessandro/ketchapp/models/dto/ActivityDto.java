@@ -26,5 +26,5 @@ public class ActivityDto {
 
     private ActivityAction action;
 
-    private Timestamp createdAt;
+    private Timestamp createdAt = new Timestamp(System.currentTimeMillis());
 }

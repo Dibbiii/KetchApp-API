@@ -65,9 +65,6 @@ public class ActivitiesControllers {
             throw new IllegalArgumentException("Activity data or user UUID cannot be null");
         }
         ActivityEntity activityEntity = convertDtoToEntity(activityDto);
-        if (activityEntity == null) {
-            throw new IllegalArgumentException("ActivityEntity cannot be null");
-        }
         activityEntity = activitiesRepository.save(activityEntity);
         return convertEntityToDto(activityEntity);
     }
