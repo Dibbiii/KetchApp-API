@@ -44,5 +44,6 @@ public class ActivityEntity {
         this.tomatoId = tomatoId;
         this.type = type;
         this.action = action;
+        this.createdAt = new Timestamp(System.currentTimeMillis());
     }
 }

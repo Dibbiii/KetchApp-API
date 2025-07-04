@@ -2,7 +2,6 @@ package com.alessandra_alessandro.ketchapp.routes;
 
 import com.alessandra_alessandro.ketchapp.controllers.AchievementsControllers;
 import com.alessandra_alessandro.ketchapp.models.dto.AchievementDto;
-import com.alessandra_alessandro.ketchapp.models.dto.UserDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -14,9 +13,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.UUID;
-
-import static org.springframework.data.jpa.domain.AbstractPersistable_.id;
 
 @RestController
 @RequestMapping("/api/achievements")
@@ -39,25 +35,6 @@ public class AchievementsRoutes {
         }
     }
 
-    @Operation(summary = "Get achievement by UUID", description = "Fetches an achievement by user's UUID.")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Successfully retrieved achievement"),
-            @ApiResponse(responseCode = "404", description = "Achievement not found"),
-            @ApiResponse(responseCode = "500", description = "Internal server error")
-    })
-    @GetMapping("/{uuid}")
-    public ResponseEntity<AchievementDto> getAchievement(@PathVariable UUID uuid) {
-        try {
-            AchievementDto achievement = achievementsController.getAchievement(uuid);
-            if (achievement != null) {
-                return ResponseEntity.ok(achievement);
-            } else {
-                return ResponseEntity.notFound().build();
-            }
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-        }
-    }
 
     @Operation(summary = "Create a new achievement", description = "Creates a new achievement in the database.")
     @ApiResponses(value = {

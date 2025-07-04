@@ -41,7 +41,7 @@ public interface UsersRepository extends JpaRepository<UserEntity, UUID> {
                       AND a_start.type = 'TIMER'
                       AND a_start.action = 'START'
                       AND a_stop.type = 'TIMER'
-                      AND a_stop.action = 'STOP'
+                      AND a_stop.action = 'END'
                       AND t.subject = :subject
                       AND DATE(a_start.created_at) = DATE (:date)""",
             nativeQuery = true
@@ -62,7 +62,7 @@ public interface UsersRepository extends JpaRepository<UserEntity, UUID> {
               AND a_start.type = 'TIMER'
               AND a_start.action = 'START'
               AND a_stop.type = 'TIMER'
-              AND a_stop.action = 'STOP'
+              AND a_stop.action = 'END'
               AND t.subject = :subject
             """, nativeQuery = true)
     Double findTotalHoursByUserAndSubject(
@@ -78,7 +78,7 @@ public interface UsersRepository extends JpaRepository<UserEntity, UUID> {
               AND a_start.type = 'TIMER'
               AND a_start.action = 'START'
               AND a_stop.type = 'TIMER'
-              AND a_stop.action = 'STOP'
+              AND a_stop.action = 'END'
             """, nativeQuery = true)
     Double findTotalHoursByUserUUID(@Param("userUUID") UUID userUUID);
 

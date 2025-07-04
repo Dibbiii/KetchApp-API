@@ -40,7 +40,8 @@ public class AchievementsControllers {
         if (dto == null) {
             return null;
         }
-        return new AchievementEntity(dto.getUserUUID(), dto.getDescription(), dto.getCompleted());
+        // Use the constructor with icon
+        return new AchievementEntity(dto.getUserUUID(), dto.getDescription(), dto.getCompleted(), dto.getIcon());
     }
 
     public List<AchievementDto> getAchievements() {
@@ -69,8 +70,8 @@ public class AchievementsControllers {
             return convertEntityToDto(achievementEntity);
         }
 
-        // * Check if User Completed 10 Tomatoes "Completed 10 Tomatoes"
-        boolean hasCompleted10Tomatoes = usersRepository.countTomatoesByUserUUID(uuid) >= 10;
+        // * Check if User Completed 10 Tomatoes "Completed 1 Tomatoes"
+        boolean hasCompleted10Tomatoes = usersRepository.countTomatoesByUserUUID(uuid) >= 1;
         // If Achievement with the description "Completed 10 Tomatoes" exists, update it
         // If not, create a new one
         if (hasCompleted10Tomatoes) {
