@@ -99,10 +99,10 @@ public class UsersRoutes {
             @ApiResponse(responseCode = "404", description = "User not found"),
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
-    @GetMapping("/{id}")
-    public ResponseEntity<UserDto> getUser(@PathVariable UUID id) {
+    @GetMapping("/{uuid}")
+    public ResponseEntity<UserDto> getUser(@PathVariable("uuid") UUID uuid) {
         try {
-            UserDto user = usersController.getUser(id);
+            UserDto user = usersController.getUser(uuid);
             if (user != null) {
                 return ResponseEntity.ok(user);
             } else {

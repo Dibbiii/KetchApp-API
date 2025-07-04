@@ -23,4 +23,14 @@ public class AchievementDto {
     private Boolean completed;
 
     private Timestamp createdAt;
+
+    private String icon;
+
+    public AchievementDto(Integer id, UUID userUUID, String description, Boolean completed, Timestamp createdAt) {
+        this.id = id;
+        this.userUUID = userUUID;
+        this.description = description;
+        this.completed = completed;
+        this.createdAt = createdAt;
+    }
 }

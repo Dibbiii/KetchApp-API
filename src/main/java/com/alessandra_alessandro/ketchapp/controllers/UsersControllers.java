@@ -2,6 +2,7 @@ package com.alessandra_alessandro.ketchapp.controllers;
 
 import com.alessandra_alessandro.ketchapp.models.dto.*;
 import com.alessandra_alessandro.ketchapp.models.entity.*;
+import com.alessandra_alessandro.ketchapp.repositories.AchievementsRepository;
 import com.alessandra_alessandro.ketchapp.repositories.UsersRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -18,10 +19,12 @@ import java.util.stream.Collectors;
 public class UsersControllers {
 
     private final UsersRepository usersRepository;
+    private final AchievementsRepository achievementsRepository;
 
     @Autowired
-    public UsersControllers(UsersRepository usersRepository) {
+    public UsersControllers(UsersRepository usersRepository, AchievementsRepository achievementsRepository) {
         this.usersRepository = usersRepository;
+        this.achievementsRepository = achievementsRepository;
     }
 
     private UserDto convertEntityToDto(UserEntity entity) {
@@ -173,14 +176,45 @@ public class UsersControllers {
         if (uuid == null) {
             throw new IllegalArgumentException("UUID cannot be null");
         }
+        // Check if user exists
+        if (usersRepository.findById(uuid).isEmpty()) {
+            return new ArrayList<>(); // or throw new IllegalArgumentException("User not found");
+        }
+
+        // --- Achievement: Studied for 5 hours ---
+        String studiedIcon = "https://cdn-icons-png.flaticon.com/512/3068/3068380.png";
+        Double totalHours = usersRepository.findTotalHoursByUserUUID(uuid);
+        if (totalHours == null) totalHours = 0.0;
+        Optional<AchievementEntity> studiedAchievement = usersRepository.findAchievementsByUuid(uuid).stream()
+            .filter(a -> "Studied for 5 hours".equals(a.getDescription())).findFirst();
+        boolean studiedCompleted = totalHours >= 5.0;
+        AchievementEntity studiedEntity = studiedAchievement.orElseGet(() -> new AchievementEntity(uuid, "Studied for 5 hours", studiedCompleted, studiedIcon));
+        studiedEntity.setCompleted(studiedCompleted);
+        studiedEntity.setIcon(studiedIcon);
+        achievementsRepository.save(studiedEntity);
+
+        // --- Achievement: Completed 10 Tomatoes ---
+        String tomatoIcon = "https://cdn-icons-png.flaticon.com/512/590/590685.png";
+        int tomatoCount = Math.toIntExact(usersRepository.countTomatoesByUserUUID(uuid));
+        Optional<AchievementEntity> tomatoAchievement = usersRepository.findAchievementsByUuid(uuid).stream()
+            .filter(a -> "Completed 10 Tomatoes".equals(a.getDescription())).findFirst();
+        boolean tomatoCompleted = tomatoCount >= 10;
+        AchievementEntity tomatoEntity = tomatoAchievement.orElseGet(() -> new AchievementEntity(uuid, "Completed 10 Tomatoes", tomatoCompleted, tomatoIcon));
+        tomatoEntity.setCompleted(tomatoCompleted);
+        tomatoEntity.setIcon(tomatoIcon);
+        achievementsRepository.save(tomatoEntity);
+
+        // Fetch all achievements for the user and return them
         List<AchievementEntity> achievements = usersRepository.findAchievementsByUuid(uuid);
+        if (achievements == null) return new ArrayList<>();
         return achievements.stream()
-                .map(achievement -> new AchievementDto(
-                        achievement.getId(),
-                        achievement.getUserUUID(),
-                        achievement.getDescription(),
-                        achievement.getCompleted(),
-                        achievement.getCreatedAt()
+                .map(achievementEntity -> new AchievementDto(
+                        achievementEntity.getId(),
+                        achievementEntity.getUserUUID(),
+                        achievementEntity.getDescription(),
+                        achievementEntity.getCompleted(),
+                        achievementEntity.getCreatedAt(),
+                        achievementEntity.getIcon()
                 )).collect(Collectors.toList());
     }
 

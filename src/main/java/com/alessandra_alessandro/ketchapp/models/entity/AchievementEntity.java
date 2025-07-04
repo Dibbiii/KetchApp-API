@@ -1,9 +1,6 @@
 package com.alessandra_alessandro.ketchapp.models.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -20,6 +17,7 @@ import java.util.UUID;
 @AllArgsConstructor
 public class AchievementEntity {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
     @Column(name = "user_uuid")
@@ -33,10 +31,22 @@ public class AchievementEntity {
 
     private Boolean completed;
 
+    @Column(name = "icon")
+    private String icon;
+
     public AchievementEntity(UUID userUUID, String description, Boolean completed) {
         this.userUUID = userUUID;
         this.description = description;
         this.completed = completed;
+        this.createdAt = new Timestamp(System.currentTimeMillis());
+        this.icon = "default_icon.png"; // Default icon if not provided
+    }
+
+    public AchievementEntity(UUID userUUID, String description, Boolean completed, String icon) {
+        this.userUUID = userUUID;
+        this.description = description;
+        this.completed = completed;
+        this.icon = icon;
         this.createdAt = new Timestamp(System.currentTimeMillis());
     }
 }
