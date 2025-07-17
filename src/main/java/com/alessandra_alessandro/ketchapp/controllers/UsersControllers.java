@@ -156,6 +156,32 @@ public class UsersControllers {
                 )).collect(Collectors.toList());
     }
 
+    public List<TomatoDto> getUserTomatoes(UUID uuid, LocalDate startDate, LocalDate endDate) {
+        if (uuid == null) {
+            throw new IllegalArgumentException("UUID cannot be null");
+        }
+        if (startDate == null || endDate == null) {
+            throw new IllegalArgumentException("Both startDate and endDate must be provided");
+        }
+        List<TomatoEntity> tomatoes = usersRepository.findTomatoesByUuid(uuid);
+        return tomatoes.stream()
+                .filter(tomato -> {
+                    LocalDate tomatoDate = tomato.getCreatedAt().toLocalDateTime().toLocalDate();
+                    return (tomatoDate.isEqual(startDate) || tomatoDate.isAfter(startDate)) &&
+                           (tomatoDate.isEqual(endDate) || tomatoDate.isBefore(endDate));
+                })
+                .map(tomato -> new TomatoDto(
+                        tomato.getId(),
+                        tomato.getUserUUID(),
+                        tomato.getStartAt(),
+                        tomato.getEndAt(),
+                        tomato.getPauseEnd(),
+                        tomato.getNextTomatoId(),
+                        tomato.getSubject(),
+                        tomato.getCreatedAt()
+                )).collect(Collectors.toList());
+    }
+
     public List<ActivityDto> getUserActivities(UUID uuid) {
         if (uuid == null) {
             throw new IllegalArgumentException("UUID cannot be null");
@@ -295,3 +321,4 @@ public class UsersControllers {
         return statisticsDto;
     }
 }
+

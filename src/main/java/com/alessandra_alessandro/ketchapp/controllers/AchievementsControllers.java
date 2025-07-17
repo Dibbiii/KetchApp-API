@@ -9,7 +9,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
@@ -49,43 +48,6 @@ public class AchievementsControllers {
         return entities.stream()
                 .map(this::convertEntityToDto)
                 .collect(Collectors.toList());
-    }
-
-    public AchievementDto getAchievement(UUID uuid) {
-        if (uuid == null) {
-            throw new IllegalArgumentException("ID cannot be null");
-        }
-        // * Find the achievement by user UUID
-        Optional<AchievementEntity> achievement = achievementsRepository.findByUserUUID(uuid);
-
-        // * Check if User Studied for 5 hours "Studied for 5 hours"
-        Double totalHours = usersRepository.findTotalHoursByUserUUID(uuid);
-        boolean hasStudiedFor5Hours = totalHours != null && totalHours >= 5.0;
-        // If Achievement with the description "Studied for 5 hours" exists, update it
-        // If not, create a new one
-        if (hasStudiedFor5Hours) {
-            AchievementEntity achievementEntity = achievement.orElseGet(() -> new AchievementEntity(uuid, "Studied for 5 hours", true));
-            achievementEntity.setCompleted(true);
-            achievementsRepository.save(achievementEntity);
-            return convertEntityToDto(achievementEntity);
-        }
-
-        // * Check if User Completed 10 Tomatoes "Completed 1 Tomatoes"
-        boolean hasCompleted10Tomatoes = usersRepository.countTomatoesByUserUUID(uuid) >= 1;
-        // If Achievement with the description "Completed 10 Tomatoes" exists, update it
-        // If not, create a new one
-        if (hasCompleted10Tomatoes) {
-            AchievementEntity achievementEntity = achievement.orElseGet(() -> new AchievementEntity(uuid, "Completed 10 Tomatoes", true));
-            achievementEntity.setCompleted(true);
-            achievementsRepository.save(achievementEntity);
-            return convertEntityToDto(achievementEntity);
-        }
-
-        if (achievement.isPresent()) {
-            return convertEntityToDto(achievement.get());
-        } else {
-            throw new IllegalArgumentException("Achievement not found with ID: " + uuid);
-        }
     }
 
     public AchievementDto createAchievement(AchievementDto achievementDto) {

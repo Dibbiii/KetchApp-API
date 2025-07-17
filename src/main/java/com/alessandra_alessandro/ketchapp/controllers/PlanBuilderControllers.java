@@ -1,7 +1,7 @@
 package com.alessandra_alessandro.ketchapp.controllers;
 
+import com.alessandra_alessandro.ketchapp.kafka.KafkaProducer;
 import com.alessandra_alessandro.ketchapp.models.dto.planBuilderRequest.PlanBuilderRequestDto;
-import com.alessandra_alessandro.ketchapp.models.dto.planBuilderRequest.PlanBuilderRequestTomatoesDto;
 import com.alessandra_alessandro.ketchapp.models.dto.planBuilderResponse.PlanBuilderResponseDto;
 import com.alessandra_alessandro.ketchapp.utils.GeminiApi;
 import org.springframework.http.ResponseEntity;
@@ -15,17 +15,19 @@ import java.sql.Timestamp;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.List;
 
 @Service
 public class PlanBuilderControllers {
     private final TomatoesControllers tomatoesControllers;
     private final TomatoesRepository tomatoesRepository;
 
+    private final KafkaProducer kafkaProducer;
+
     @Autowired
-    public PlanBuilderControllers(TomatoesControllers tomatoesControllers, TomatoesRepository tomatoesRepository) {
+    public PlanBuilderControllers(TomatoesControllers tomatoesControllers, TomatoesRepository tomatoesRepository, KafkaProducer kafkaProducer) {
         this.tomatoesControllers = tomatoesControllers;
         this.tomatoesRepository = tomatoesRepository;
+        this.kafkaProducer = kafkaProducer;
     }
 
     public ResponseEntity<PlanBuilderRequestDto> createPlanBuilder(PlanBuilderResponseDto dto) {
@@ -82,5 +84,11 @@ public class PlanBuilderControllers {
             // Optionally: log the error here if you wish
             throw new IllegalArgumentException("Invalid timestamp string: " + isoString, e);
         }
+    }
+
+    public String TestKafka(String message) {
+        this.kafkaProducer.sendMessage(message);
+        System.out.println("MESASGE SEND KAFKA");
+        return message;
     }
 }
