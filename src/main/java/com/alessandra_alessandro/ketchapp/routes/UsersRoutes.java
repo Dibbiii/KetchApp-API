@@ -141,7 +141,7 @@ public class UsersRoutes {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successfully retrieved tomatoes for user",
                     content = @Content(mediaType = "application/json",
-                            schema = @Schema(implementation = UserDto.class))),
+                            schema = @Schema(implementation = TomatoDto.class))),
             @ApiResponse(responseCode = "404", description = "User not found"),
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
