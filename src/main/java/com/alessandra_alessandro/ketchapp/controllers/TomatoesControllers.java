@@ -10,8 +10,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 public class TomatoesControllers {
@@ -54,25 +52,6 @@ public class TomatoesControllers {
         );
     }
 
-    public List<TomatoDto> getTomatoes() {
-        List<TomatoEntity> tomatoes = tomatoesRepository.findAll();
-        return tomatoes.stream()
-                .map(this::convertEntityToDto)
-                .collect(Collectors.toList());
-    }
-
-    public TomatoDto getTomato(Integer id) {
-        if (id == null) {
-            throw new IllegalArgumentException("ID cannot be null");
-        }
-        Optional<TomatoEntity> tomatoEntity = tomatoesRepository.findById(id);
-        if (tomatoEntity.isPresent()) {
-            return convertEntityToDto(tomatoEntity.get());
-        } else {
-            throw new IllegalArgumentException("Tomato not found");
-        }
-    }
-
     public TomatoDto createTomato(TomatoDto tomatoDto) {
         if (tomatoDto == null) {
             throw new IllegalArgumentException("TomatoDto cannot be null");
@@ -80,19 +59,6 @@ public class TomatoesControllers {
         TomatoEntity tomatoEntity = convertDtoToEntity(tomatoDto);
         TomatoEntity savedTomato = tomatoesRepository.save(tomatoEntity);
         return convertEntityToDto(savedTomato);
-    }
-
-    public TomatoDto deleteTomato(Integer id) {
-        if (id == null) {
-            throw new IllegalArgumentException("ID cannot be null");
-        }
-        Optional<TomatoEntity> tomatoEntity = tomatoesRepository.findById(id);
-        if (tomatoEntity.isPresent()) {
-            tomatoesRepository.delete(tomatoEntity.get());
-            return convertEntityToDto(tomatoEntity.get());
-        } else {
-            throw new IllegalArgumentException("Tomato not found");
-        }
     }
 
     public List<ActivityDto> getActivitiesByTomatoId(Integer tomatoId) {

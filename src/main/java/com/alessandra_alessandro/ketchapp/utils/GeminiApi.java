@@ -7,6 +7,11 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -14,22 +19,27 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.LocalDate;
 
+@Component
 public class GeminiApi {
     public static final String BASE_URL = "https://generativelanguage.googleapis.com/v1beta/models/";
-    public static final String API_KEY = System.getenv("GEMINI_API_KEY");
+    private final String apiKey;
     public static final String MODEL = "gemini-2.5-flash";
-    public static final String ENDPOINT = BASE_URL + MODEL + ":generateContent?key=" + API_KEY;
-
+    private final String endpoint;
     private static final HttpClient HTTP_CLIENT = HttpClient.newHttpClient();
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
+    private static final Logger log = LoggerFactory.getLogger(GeminiApi.class);
 
-    public static PlanBuilderRequestDto ask(PlanBuilderResponseDto dto) {
+    public GeminiApi(@Value("${GEMINI_API_KEY}") String apiKey) {
+        this.apiKey = apiKey;
+        this.endpoint = BASE_URL + MODEL + ":generateContent?key=" + apiKey;
+    }
+
+    public PlanBuilderRequestDto ask(PlanBuilderResponseDto dto) {
         assert dto != null : "Request DTO cannot be null";
-        if (API_KEY == null || API_KEY.isEmpty()) {
-            System.err.println("Error: GEMINI_API_KEY environment variable not set.");
+        if (apiKey == null || apiKey.isEmpty()) {
+            log.error("Error: GEMINI_API_KEY property not set in application.properties.");
             return null;
         }
-
         String session = getSessionFromDto(dto);
         String pause = getPauseFromDto(dto);
         String question = buildQuestion(session, pause, dto);
@@ -41,14 +51,12 @@ public class GeminiApi {
             HttpResponse<String> response = HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
 
             if (response.statusCode() != 200) {
-                System.err.println("Error: Gemini API returned status code " + response.statusCode());
-                System.err.println("Response body: " + response.body());
+                log.error("Error: Gemini API returned status code {}", response.statusCode());
                 return null;
             }
             return extractDtoFromGeminiResponse(response.body());
         } catch (Exception e) {
-            System.err.println("Error in GeminiApi.ask: " + e.getMessage());
-            e.printStackTrace();
+            log.error("Error in GeminiApi.ask: {}", e.getMessage());
         }
         return null;
     }
@@ -79,7 +87,7 @@ public class GeminiApi {
                         La durata di ogni sessione di studio dura %s e la pausa %s.
                         Tieni un margine di 30 minuti prima e dopo ogni evento nel calendar.
                         Ricordati che Start_at, End_at e Pause_end_at sono in formato ISO 8601 (YYYY-MM-DDTHH:MM:SSZ).""",
-                LocalDate.now(), // Aggiunto: la data di oggi
+                LocalDate.now(),
                 subjectsInfo,
                 session,
                 pause);
@@ -109,39 +117,34 @@ public class GeminiApi {
     }
 
     private static ObjectNode buildResponseSchema() {
-        // Build the schema using the GeminiResponseSchema class structure
         ObjectNode mainProperties = OBJECT_MAPPER.createObjectNode();
 
-        // CalendarItem schema
         ObjectNode calendarItemProperties = OBJECT_MAPPER.createObjectNode();
-        calendarItemProperties.set("title", createPropertySchema("string"));
-        calendarItemProperties.set("start_at", createPropertySchema("string"));
-        calendarItemProperties.set("end_at", createPropertySchema("string"));
+        calendarItemProperties.set("title", createPropertySchema());
+        calendarItemProperties.set("start_at", createPropertySchema());
+        calendarItemProperties.set("end_at", createPropertySchema());
         ObjectNode calendarItemSchema = createObjectSchema(calendarItemProperties, "title", "start_at", "end_at");
 
-        // TomatoItem schema (for inside subjects)
         ObjectNode tomatoItemProperties = OBJECT_MAPPER.createObjectNode();
-        tomatoItemProperties.set("start_at", createPropertySchema("string"));
-        tomatoItemProperties.set("end_at", createPropertySchema("string"));
-        tomatoItemProperties.set("pause_end_at", createPropertySchema("string"));
+        tomatoItemProperties.set("start_at", createPropertySchema());
+        tomatoItemProperties.set("end_at", createPropertySchema());
+        tomatoItemProperties.set("pause_end_at", createPropertySchema());
         ObjectNode tomatoItemSchema = createObjectSchema(tomatoItemProperties, "start_at", "end_at", "pause_end_at");
 
-        // SubjectItem schema
         ObjectNode subjectItemProperties = OBJECT_MAPPER.createObjectNode();
-        subjectItemProperties.set("name", createPropertySchema("string"));
+        subjectItemProperties.set("name", createPropertySchema());
         subjectItemProperties.set("tomatoes", createArraySchema(tomatoItemSchema));
         ObjectNode subjectItemSchema = createObjectSchema(subjectItemProperties, "name", "tomatoes");
 
-        // Main schema
         mainProperties.set("calendar", createArraySchema(calendarItemSchema));
         mainProperties.set("subjects", createArraySchema(subjectItemSchema));
 
         return createObjectSchema(mainProperties, "calendar", "subjects");
     }
 
-    private static ObjectNode createPropertySchema(String type) {
+    private static ObjectNode createPropertySchema() {
         ObjectNode schema = OBJECT_MAPPER.createObjectNode();
-        schema.put("type", type);
+        schema.put("type", "string");
         return schema;
     }
 
@@ -160,15 +163,15 @@ public class GeminiApi {
         for (String field : requiredFields) {
             required.add(field);
         }
-        if (required.size() > 0) {
+        if (!required.isEmpty()) {
             schema.set("required", required);
         }
         return schema;
     }
 
-    private static HttpRequest buildHttpRequest(String jsonPayload) {
+    private HttpRequest buildHttpRequest(String jsonPayload) {
         return HttpRequest.newBuilder()
-                .uri(URI.create(ENDPOINT))
+                .uri(URI.create(endpoint))
                 .header("Content-Type", "application/json")
                 .POST(HttpRequest.BodyPublishers.ofString(jsonPayload))
                 .build();
@@ -185,9 +188,9 @@ public class GeminiApi {
                     return OBJECT_MAPPER.readValue(jsonText, PlanBuilderRequestDto.class);
                 }
             }
-            System.err.println("Could not extract DTO from Gemini API response: " + responseBody);
+            log.error("Could not extract DTO from Gemini API response: {}", responseBody);
         } catch (Exception e) {
-            System.err.println("Error parsing Gemini API response: " + e.getMessage());
+            log.error("Error parsing Gemini API response: {}", e.getMessage());
         }
         return null;
     }

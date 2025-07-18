@@ -34,14 +34,6 @@ public class AchievementEntity {
     @Column(name = "icon")
     private String icon;
 
-    public AchievementEntity(UUID userUUID, String description, Boolean completed) {
-        this.userUUID = userUUID;
-        this.description = description;
-        this.completed = completed;
-        this.createdAt = new Timestamp(System.currentTimeMillis());
-        this.icon = "default_icon.png"; // Default icon if not provided
-    }
-
     public AchievementEntity(UUID userUUID, String description, Boolean completed, String icon) {
         this.userUUID = userUUID;
         this.description = description;

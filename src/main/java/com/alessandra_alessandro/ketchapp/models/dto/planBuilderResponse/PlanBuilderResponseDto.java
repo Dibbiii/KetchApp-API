@@ -30,7 +30,6 @@ public class PlanBuilderResponseDto {
 
     @Valid
     @NotNull
-    @Size(min = 1)
     private List<PlanBuilderResponseCalendarDto> calendar;
 
     @Valid

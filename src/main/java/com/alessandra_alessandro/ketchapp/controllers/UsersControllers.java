@@ -5,8 +5,10 @@ import com.alessandra_alessandro.ketchapp.models.entity.*;
 import com.alessandra_alessandro.ketchapp.repositories.AchievementsRepository;
 import com.alessandra_alessandro.ketchapp.repositories.UsersRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -34,7 +36,6 @@ public class UsersControllers {
         UserDto dto = new UserDto();
         dto.setUuid(entity.getUuid());
         dto.setUsername(entity.getUsername());
-        // Not setting totalTomatoes or totalHours here, as this is a simple converter
         return dto;
     }
 
@@ -53,45 +54,14 @@ public class UsersControllers {
         if (userDto == null) {
             throw new IllegalArgumentException("UserDto cannot be null");
         }
+        if (usersRepository.findByUsername(userDto.getUsername()).isPresent()) {
+            throw new ResponseStatusException(
+                    HttpStatus.CONFLICT, "User already exists"
+            );
+        }
         UserEntity userEntity = convertDtoToEntity(userDto);
         userEntity = usersRepository.save(userEntity);
         return convertEntityToDto(userEntity);
-    }
-
-    @Transactional
-    public UserDto deleteUser(UUID uuid) {
-        if (uuid == null) {
-            throw new IllegalArgumentException("UUID cannot be null");
-        }
-        Optional<UserEntity> entityOptional = usersRepository.findById(uuid);
-        if (entityOptional.isPresent()) {
-            usersRepository.delete(entityOptional.get());
-            return convertEntityToDto(entityOptional.get());
-        } else {
-            throw new IllegalArgumentException("User with UUID '" + uuid + "' not found.");
-        }
-    }
-
-    public List<UserDto> getUsers() {
-        List<UserEntity> entities = usersRepository.findAll();
-        List<UserDto> users = new ArrayList<>();
-        for (UserEntity entity : entities) {
-            double totalHours = 0.0;
-            // Usa i nuovi metodi senza filtro data
-            List<String> subjects = usersRepository.findSubjectsByUuid(entity.getUuid());
-            for (String subject : subjects) {
-                Double subjectHours = usersRepository.findTotalHoursByUserAndSubject(entity.getUuid(), subject);
-                if (subjectHours != null) {
-                    totalHours += subjectHours;
-                }
-            }
-            UserDto userDto = new UserDto();
-            userDto.setUuid(entity.getUuid());
-            userDto.setUsername(entity.getUsername());
-            userDto.setTotalHours(totalHours);
-            users.add(userDto);
-        }
-        return users;
     }
 
     public UserDto getUser(UUID id) {
@@ -106,7 +76,6 @@ public class UsersControllers {
         }
     }
 
-    // Restituisce la mail dato l'username
     public String getEmailByUsername(String username) {
         if (username == null || username.isEmpty()) {
             throw new IllegalArgumentException("Username cannot be null or empty");
@@ -168,7 +137,7 @@ public class UsersControllers {
                 .filter(tomato -> {
                     LocalDate tomatoDate = tomato.getCreatedAt().toLocalDateTime().toLocalDate();
                     return (tomatoDate.isEqual(startDate) || tomatoDate.isAfter(startDate)) &&
-                           (tomatoDate.isEqual(endDate) || tomatoDate.isBefore(endDate));
+                            (tomatoDate.isEqual(endDate) || tomatoDate.isBefore(endDate));
                 })
                 .map(tomato -> new TomatoDto(
                         tomato.getId(),
@@ -202,35 +171,31 @@ public class UsersControllers {
         if (uuid == null) {
             throw new IllegalArgumentException("UUID cannot be null");
         }
-        // Check if user exists
         if (usersRepository.findById(uuid).isEmpty()) {
-            return new ArrayList<>(); // or throw new IllegalArgumentException("User not found");
+            return new ArrayList<>();
         }
 
-        // --- Achievement: Studied for 5 hours ---
         String studiedIcon = "https://cdn-icons-png.flaticon.com/512/3068/3068380.png";
         Double totalHours = usersRepository.findTotalHoursByUserUUID(uuid);
         if (totalHours == null) totalHours = 0.0;
         Optional<AchievementEntity> studiedAchievement = usersRepository.findAchievementsByUuid(uuid).stream()
-            .filter(a -> "Studied for 5 hours".equals(a.getDescription())).findFirst();
+                .filter(a -> "Studied for 5 hours".equals(a.getDescription())).findFirst();
         boolean studiedCompleted = totalHours >= 5.0;
         AchievementEntity studiedEntity = studiedAchievement.orElseGet(() -> new AchievementEntity(uuid, "Studied for 5 hours", studiedCompleted, studiedIcon));
         studiedEntity.setCompleted(studiedCompleted);
         studiedEntity.setIcon(studiedIcon);
         achievementsRepository.save(studiedEntity);
 
-        // --- Achievement: Completed 10 Tomatoes ---
         String tomatoIcon = "https://cdn-icons-png.flaticon.com/512/590/590685.png";
         int tomatoCount = Math.toIntExact(usersRepository.countTomatoesByUserUUID(uuid));
         Optional<AchievementEntity> tomatoAchievement = usersRepository.findAchievementsByUuid(uuid).stream()
-            .filter(a -> "Completed 10 Tomatoes".equals(a.getDescription())).findFirst();
+                .filter(a -> "Completed 10 Tomatoes".equals(a.getDescription())).findFirst();
         boolean tomatoCompleted = tomatoCount >= 10;
         AchievementEntity tomatoEntity = tomatoAchievement.orElseGet(() -> new AchievementEntity(uuid, "Completed 10 Tomatoes", tomatoCompleted, tomatoIcon));
         tomatoEntity.setCompleted(tomatoCompleted);
         tomatoEntity.setIcon(tomatoIcon);
         achievementsRepository.save(tomatoEntity);
 
-        // Fetch all achievements for the user and return them
         List<AchievementEntity> achievements = usersRepository.findAchievementsByUuid(uuid);
         if (achievements == null) return new ArrayList<>();
         return achievements.stream()
@@ -243,37 +208,6 @@ public class UsersControllers {
                         achievementEntity.getIcon()
                 )).collect(Collectors.toList());
     }
-
-    public List<FriendDto> getUserFriends(UUID uuid) {
-        if (uuid == null) {
-            throw new IllegalArgumentException("UUID cannot be null");
-        }
-        List<FriendEntity> friends = usersRepository.findFriendsByUuid(uuid);
-        return friends.stream()
-                .map(friend -> new FriendDto(
-                        friend.getId(),
-                        friend.getUserUUID(),
-                        friend.getFriendUUID(),
-                        friend.getCreatedAt()
-                )).collect(Collectors.toList());
-    }
-
-    public List<AppointmentDto> getUserAppointments(UUID uuid) {
-        if (uuid == null) {
-            throw new IllegalArgumentException("UUID cannot be null");
-        }
-        List<AppointmentEntity> appointments = usersRepository.findAppointmentsByUuid(uuid);
-        return appointments.stream()
-                .map(appointment -> new AppointmentDto(
-                        appointment.getId(),
-                        appointment.getUserUUID(),
-                        appointment.getName(),
-                        appointment.getStartAt(),
-                        appointment.getEndAt(),
-                        appointment.getCreatedAt()
-                )).collect(Collectors.toList());
-    }
-
 
     public UUID getUserUUIDByFirebaseUID(String firebaseUID) {
         if (firebaseUID == null || firebaseUID.isEmpty()) {

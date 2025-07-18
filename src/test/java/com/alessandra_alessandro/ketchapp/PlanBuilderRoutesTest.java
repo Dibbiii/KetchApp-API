@@ -103,7 +103,7 @@ public class PlanBuilderRoutesTest {
 
     @Test
     void testCreatePlanBuilder_BadRequest() throws Exception {
-        PlanBuilderResponseDto responseDto = new PlanBuilderResponseDto(); // Invalid DTO
+        PlanBuilderResponseDto responseDto = new PlanBuilderResponseDto();
 
         mockMvc.perform(post("/api/plans")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -115,7 +115,7 @@ public class PlanBuilderRoutesTest {
     @Test
     void testCreatePlanBuilder_PartialBadRequest() throws Exception {
         PlanBuilderResponseDto responseDto = new PlanBuilderResponseDto();
-        responseDto.setUserUUID(UUID.randomUUID()); // Set some fields but leave others null
+        responseDto.setUserUUID(UUID.randomUUID());
 
         mockMvc.perform(post("/api/plans")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -127,7 +127,7 @@ public class PlanBuilderRoutesTest {
     @Test
     void testCreatePlanBuilder_InvalidValuesBadRequest() throws Exception {
         PlanBuilderResponseDto responseDto = createValidResponseDto();
-        responseDto.setSession(""); // Invalid value
+        responseDto.setSession("");
 
         mockMvc.perform(post("/api/plans")
                         .contentType(MediaType.APPLICATION_JSON)

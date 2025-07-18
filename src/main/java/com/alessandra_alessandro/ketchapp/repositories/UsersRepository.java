@@ -23,12 +23,6 @@ public interface UsersRepository extends JpaRepository<UserEntity, UUID> {
     @Query("SELECT a FROM AchievementEntity a WHERE a.userUUID = :userUUID")
     List<AchievementEntity> findAchievementsByUuid(@Param("userUUID") UUID userUUID);
 
-    @Query("SELECT f FROM FriendEntity f WHERE f.userUUID = :userUUID")
-    List<FriendEntity> findFriendsByUuid(@Param("userUUID") UUID userUUID);
-
-    @Query("SELECT a FROM AppointmentEntity a WHERE a.userUUID = :userUUID")
-    List<AppointmentEntity> findAppointmentsByUuid(@Param("userUUID") UUID userUUID);
-
     @Query("SELECT DISTINCT t.subject FROM TomatoEntity t WHERE t.userUUID = :userUUID AND DATE(t.createdAt) = DATE(:date) ORDER BY t.subject")
     List<String> findSubjectsByUuidAndDate(@Param("userUUID") UUID userUUID, @Param("date") String date);
 

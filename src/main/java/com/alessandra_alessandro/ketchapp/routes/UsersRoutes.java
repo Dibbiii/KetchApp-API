@@ -13,9 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
-import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 
 @RestController
@@ -35,6 +33,8 @@ public class UsersRoutes {
                     content = @Content(mediaType = "application/json",
                             schema = @Schema(implementation = UserDto.class))),
             @ApiResponse(responseCode = "400", description = "Bad request (e.g., invalid data)"),
+            @ApiResponse(responseCode = "401", description = "Unauthorized (authentication required)"),
+            @ApiResponse(responseCode = "409", description = "Conflict (e.g., username already exists)"),
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
     @PostMapping
@@ -49,53 +49,12 @@ public class UsersRoutes {
         }
     }
 
-    @Operation(summary = "Update user by UUID", description = "Updates an existing user record by its UUID. User data should be provided in the request body.")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Successfully updated user record",
-                    content = @Content(mediaType = "application/json",
-                            schema = @Schema(implementation = UserDto.class))),
-            @ApiResponse(responseCode = "400", description = "Bad request (e.g., invalid data)"),
-            @ApiResponse(responseCode = "404", description = "User not found"),
-            @ApiResponse(responseCode = "500", description = "Internal server error")
-    })
-    @DeleteMapping("/{uuid}")
-    public ResponseEntity<UserDto> deleteUser(@PathVariable UUID uuid) {
-        try {
-            UserDto deletedUser = usersController.deleteUser(uuid);
-            if (deletedUser != null) {
-                return ResponseEntity.ok(deletedUser);
-            } else {
-                return ResponseEntity.notFound().build();
-            }
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().build();
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-        }
-    }
-
-    @Operation(summary = "Get all users", description = "Fetches a list of all user records.")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Successfully retrieved user records",
-                    content = @Content(mediaType = "application/json",
-                            schema = @Schema(implementation = UserDto.class))),
-            @ApiResponse(responseCode = "500", description = "Internal server error")
-    })
-    @GetMapping
-    public ResponseEntity<List<UserDto>> getUsers() {
-        try {
-            List<UserDto> users = usersController.getUsers();
-            return ResponseEntity.ok(users);
-        } catch (Exception e) {
-            return ResponseEntity.internalServerError().build();
-        }
-    }
-
     @Operation(summary = "Get user by UUID", description = "Fetches a user record by its UUID.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successfully retrieved user record",
                     content = @Content(mediaType = "application/json",
                             schema = @Schema(implementation = UserDto.class))),
+            @ApiResponse(responseCode = "401", description = "Unauthorized (authentication required)"),
             @ApiResponse(responseCode = "404", description = "User not found"),
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
@@ -118,6 +77,7 @@ public class UsersRoutes {
             @ApiResponse(responseCode = "200", description = "Successfully retrieved email address",
                     content = @Content(mediaType = "application/json",
                             schema = @Schema(implementation = String.class))),
+            @ApiResponse(responseCode = "401", description = "Unauthorized (authentication required)"),
             @ApiResponse(responseCode = "404", description = "Username not found"),
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
@@ -142,6 +102,7 @@ public class UsersRoutes {
             @ApiResponse(responseCode = "200", description = "Successfully retrieved tomatoes for user",
                     content = @Content(mediaType = "application/json",
                             schema = @Schema(implementation = TomatoDto.class))),
+            @ApiResponse(responseCode = "401", description = "Unauthorized (authentication required)"),
             @ApiResponse(responseCode = "404", description = "User not found"),
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
@@ -171,7 +132,8 @@ public class UsersRoutes {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successfully retrieved activities for user",
                     content = @Content(mediaType = "application/json",
-                            schema = @Schema(implementation = UserDto.class))),
+                            schema = @Schema(implementation = ActivityDto.class))),
+            @ApiResponse(responseCode = "401", description = "Unauthorized (authentication required)"),
             @ApiResponse(responseCode = "404", description = "User not found"),
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
@@ -195,7 +157,8 @@ public class UsersRoutes {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successfully retrieved achievements for user",
                     content = @Content(mediaType = "application/json",
-                            schema = @Schema(implementation = UserDto.class))),
+                            schema = @Schema(implementation = AchievementDto.class))),
+            @ApiResponse(responseCode = "401", description = "Unauthorized (authentication required)"),
             @ApiResponse(responseCode = "404", description = "User not found"),
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
@@ -215,59 +178,12 @@ public class UsersRoutes {
         }
     }
 
-    @Operation(summary = "Get friends by user UUID", description = "Fetches a list of friends for a specific user by their UUID.")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Successfully retrieved friends for user",
-                    content = @Content(mediaType = "application/json",
-                            schema = @Schema(implementation = UserDto.class))),
-            @ApiResponse(responseCode = "404", description = "User not found"),
-            @ApiResponse(responseCode = "500", description = "Internal server error")
-    })
-    @GetMapping("/{uuid}/friends")
-    public ResponseEntity<List<FriendDto>> getUserFriends(@PathVariable UUID uuid) {
-        try {
-            List<FriendDto> friends = usersController.getUserFriends(uuid);
-            if (friends != null) {
-                return ResponseEntity.ok(friends);
-            } else {
-                return ResponseEntity.notFound().build();
-            }
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().build();
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-        }
-    }
-
-    @Operation(summary = "Get appointments by user UUID", description = "Fetches a list of appointments for a specific user by their UUID.")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Successfully retrieved appointments for user",
-                    content = @Content(mediaType = "application/json",
-                            schema = @Schema(implementation = UserDto.class))),
-            @ApiResponse(responseCode = "404", description = "User not found"),
-            @ApiResponse(responseCode = "500", description = "Internal server error")
-    })
-    @GetMapping("/{uuid}/appointments")
-    public ResponseEntity<List<AppointmentDto>> getUserAppointments(@PathVariable UUID uuid) {
-        try {
-            List<AppointmentDto> appointments = usersController.getUserAppointments(uuid);
-            if (appointments != null) {
-                return ResponseEntity.ok(appointments);
-            } else {
-                return ResponseEntity.notFound().build();
-            }
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().build();
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-        }
-    }
-
     @Operation(summary = "Get statistics by user UUID", description = "Fetches statistics for a specific user by their UUID and a date range.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successfully retrieved statistics for user",
                     content = @Content(mediaType = "application/json",
                             schema = @Schema(implementation = StatisticsDto.class))),
+            @ApiResponse(responseCode = "401", description = "Unauthorized (authentication required)"),
             @ApiResponse(responseCode = "404", description = "User not found"),
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
@@ -294,6 +210,7 @@ public class UsersRoutes {
             @ApiResponse(responseCode = "200", description = "Successfully retrieved user UUID",
                     content = @Content(mediaType = "application/json",
                             schema = @Schema(implementation = String.class))),
+            @ApiResponse(responseCode = "401", description = "Unauthorized (authentication required)"),
             @ApiResponse(responseCode = "404", description = "User not found"),
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })

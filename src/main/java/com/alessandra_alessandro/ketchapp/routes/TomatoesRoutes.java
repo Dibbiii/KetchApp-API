@@ -25,51 +25,13 @@ public class TomatoesRoutes {
         this.tomatoesController = tomatoesController;
     }
 
-    @Operation(summary = "Get all tomatoes records", description = "Fetches all tomatoes records from the database.")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Successfully retrieved tomatoes records",
-                    content = @Content(mediaType = "application/json",
-                            schema = @Schema(implementation = TomatoDto.class))),
-            @ApiResponse(responseCode = "500", description = "Internal server error")
-    })
-    @GetMapping
-    public ResponseEntity<List<TomatoDto>> getTomatoes() {
-        try {
-            List<TomatoDto> tomatoes = tomatoesController.getTomatoes();
-            return ResponseEntity.ok(tomatoes);
-        } catch (Exception e) {
-            return ResponseEntity.internalServerError().build();
-        }
-    }
-
-    @Operation(summary = "Get tomatoes records by Id", description = "Fetches tomatoes records by its Id.")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Successfully retrieved tomatoes records",
-                    content = @Content(mediaType = "application/json",
-                            schema = @Schema(implementation = TomatoDto.class))),
-            @ApiResponse(responseCode = "404", description = "Tomatoes records not found"),
-            @ApiResponse(responseCode = "500", description = "Internal server error")
-    })
-    @GetMapping("/{id}")
-    public ResponseEntity<TomatoDto> getTomato(@PathVariable Integer id) {
-        try {
-            TomatoDto getTomato = tomatoesController.getTomato(id);
-            if (getTomato != null) {
-                return ResponseEntity.ok(getTomato);
-            } else {
-                return ResponseEntity.notFound().build();
-            }
-        } catch (Exception e) {
-            return ResponseEntity.internalServerError().build();
-        }
-    }
-
     @Operation(summary = "Create a new tomato record", description = "Creates a new tomato record.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "Successfully created tomato record",
                     content = @Content(mediaType = "application/json",
                             schema = @Schema(implementation = TomatoDto.class))),
             @ApiResponse(responseCode = "400", description = "Bad request"),
+            @ApiResponse(responseCode = "401", description = "Unauthorized (authentication required)"),
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
     @PostMapping
@@ -82,31 +44,12 @@ public class TomatoesRoutes {
         }
     }
 
-    @Operation(summary = "Delete a tomato record by Id", description = "Deletes a tomato record by its id.")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Successfully deleted tomato record"),
-            @ApiResponse(responseCode = "404", description = "Tomato record not found"),
-            @ApiResponse(responseCode = "500", description = "Internal server error")
-    })
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteTomato(@PathVariable Integer id) {
-        try {
-            TomatoDto deletedTomato = tomatoesController.deleteTomato(id);
-            if (deletedTomato != null) {
-                return ResponseEntity.ok().build();
-            } else {
-                return ResponseEntity.notFound().build();
-            }
-        } catch (Exception e) {
-            return ResponseEntity.internalServerError().build();
-        }
-    }
-
     @Operation(summary = "Get all activities for a tomato", description = "Fetches all activities related to a specific tomato by its id.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successfully retrieved activities",
                     content = @Content(mediaType = "application/json",
                             schema = @Schema(implementation = ActivityDto.class))),
+            @ApiResponse(responseCode = "401", description = "Unauthorized (authentication required)"),
             @ApiResponse(responseCode = "404", description = "Tomato or activities not found"),
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })

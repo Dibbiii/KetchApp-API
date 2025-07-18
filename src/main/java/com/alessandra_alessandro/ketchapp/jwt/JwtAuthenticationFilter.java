@@ -46,7 +46,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             if (jwt != null && validateToken(jwt)) {
                 String username = getUsernameFromToken(jwt);
 
-                // Non usiamo più UserDetailsService. Creiamo l'autenticazione direttamente.
                 List<GrantedAuthority> authorities = Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER"));
                 UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
                         username, null, authorities);
@@ -55,8 +54,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 SecurityContextHolder.getContext().setAuthentication(authentication);
             }
         } catch (Exception ex) {
-            // Gestisci eccezioni come token scaduto, non valido, ecc.
-            // L'JwtAuthenticationEntryPoint si occuperà di inviare la risposta di errore 401
             System.out.println("Cannot set user authentication: " + ex.getMessage());
         }
 
@@ -112,6 +109,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private PublicKey loadPublicKey() {
         try {
             InputStream is = getClass().getClassLoader().getResourceAsStream("public.pem");
+            assert is != null;
             String publicKeyPEM = new String(is.readAllBytes())
                     .replace("-----BEGIN PUBLIC KEY-----", "")
                     .replace("-----END PUBLIC KEY-----", "")
