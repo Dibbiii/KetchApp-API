@@ -137,7 +137,7 @@ public class UsersRoutes {
         }
     }
 
-    @Operation(summary = "Get tomatoes by user UUID", description = "Fetches a list of tomatoes for a specific user by their UUID. Optionally filter by date (yyyy-MM-dd) with ?date=")
+    @Operation(summary = "Get tomatoes by user UUID", description = "Fetches a list of tomatoes for a specific user by their UUID. Optionally filter by date (yyyy-MM-dd) with ?date= or by date range with ?startDate=yyyy-MM-dd&endDate=yyyy-MM-dd (both required for range)")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successfully retrieved tomatoes for user",
                     content = @Content(mediaType = "application/json",
@@ -147,11 +147,18 @@ public class UsersRoutes {
     })
     @GetMapping("/{uuid}/tomatoes")
     public ResponseEntity<List<TomatoDto>> getUserTomatoes(@PathVariable UUID uuid,
-                                                           @RequestParam(value = "date", required = false) LocalDate date) {
+                                                           @RequestParam(value = "date", required = false) LocalDate date,
+                                                           @RequestParam(value = "startDate", required = false) LocalDate startDate,
+                                                           @RequestParam(value = "endDate", required = false) LocalDate endDate) {
         try {
-            List<TomatoDto> tomatoes = (date == null)
-                    ? usersController.getUserTomatoes(uuid)
-                    : usersController.getUserTomatoes(uuid, date);
+            List<TomatoDto> tomatoes;
+            if (startDate != null && endDate != null) {
+                tomatoes = usersController.getUserTomatoes(uuid, startDate, endDate);
+            } else if (date != null) {
+                tomatoes = usersController.getUserTomatoes(uuid, date);
+            } else {
+                tomatoes = usersController.getUserTomatoes(uuid);
+            }
             return ResponseEntity.ok(tomatoes);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().build();
