@@ -7,6 +7,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -30,7 +31,7 @@ public class PlanBuilderRoutes {
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
     @PostMapping
-    public ResponseEntity<PlanBuilderRequestDto> createPlanBuilder(@RequestBody PlanBuilderResponseDto planBuilderResponseDto) {
+    public ResponseEntity<PlanBuilderRequestDto> createPlanBuilder(@Valid @RequestBody PlanBuilderResponseDto planBuilderResponseDto) {
         return planBuilderControllers.createPlanBuilder(planBuilderResponseDto);
     }
 }

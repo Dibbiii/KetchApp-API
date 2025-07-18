@@ -5,15 +5,20 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import jakarta.validation.constraints.NotEmpty;
+
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 public class PlanBuilderResponseCalendarDto {
 
+    @NotEmpty
     private String start_at;
 
+    @NotEmpty
     private String end_at;
 
+    @NotEmpty
     private String title;
 }
