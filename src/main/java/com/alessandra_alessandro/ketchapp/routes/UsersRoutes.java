@@ -27,6 +27,25 @@ public class UsersRoutes {
         this.usersController = usersController;
     }
 
+
+    @Operation(summary = "Get all users", description = "Fetches a list of all user records.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully retrieved user records",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = UserDto.class))),
+            @ApiResponse(responseCode = "401", description = "Unauthorized (authentication required)"),
+            @ApiResponse(responseCode = "500", description = "Internal server error")
+    })
+    @GetMapping
+    public ResponseEntity<List<UserDto>> getUsers() {
+        try {
+            List<UserDto> users = usersController.getUsers();
+            return ResponseEntity.ok(users);
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().build();
+        }
+    }
+
     @Operation(summary = "Create a new user", description = "Creates a new user record in the database.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "Successfully created user record",

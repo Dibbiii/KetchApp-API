@@ -49,6 +49,19 @@ public class UsersControllers {
         );
     }
 
+    public List<UserDto> getUsers() {
+        List<Object[]> results = usersRepository.findTop100UsersByTotalHours();
+        List<UserDto> users = new ArrayList<>();
+        for (Object[] row : results) {
+            UserDto userDto = new UserDto();
+            userDto.setUuid(row[0] != null ? UUID.fromString(row[0].toString()) : null);
+            userDto.setUsername(row[1] != null ? row[1].toString() : null);
+            userDto.setTotalHours(row[2] != null ? ((Number) row[2]).doubleValue() : 0.0);
+            users.add(userDto);
+        }
+        return users;
+    }
+
     @Transactional
     public UserDto createUser(UserDto userDto) {
         if (userDto == null) {
