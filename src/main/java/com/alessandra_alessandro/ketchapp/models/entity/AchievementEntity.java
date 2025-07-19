@@ -31,14 +31,10 @@ public class AchievementEntity {
 
     private Boolean completed;
 
-    @Column(name = "icon")
-    private String icon;
-
-    public AchievementEntity(UUID userUUID, String description, Boolean completed, String icon) {
-        this.userUUID = userUUID;
-        this.description = description;
-        this.completed = completed;
-        this.icon = icon;
-        this.createdAt = new Timestamp(System.currentTimeMillis());
+    public AchievementEntity(UUID uuid, String s, boolean tomatoCompleted) {
+        this.userUUID = uuid;
+        this.description = s;
+        this.createdAt = Timestamp.from(java.time.Instant.now());
+        this.completed = tomatoCompleted;
     }
 }

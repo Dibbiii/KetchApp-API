@@ -223,29 +223,4 @@ public class UsersRoutes {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
-
-    @Operation(summary = "Get user UUID by Firebase UID", description = "Fetches the UUID of a user by their Firebase UID.")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Successfully retrieved user UUID",
-                    content = @Content(mediaType = "application/json",
-                            schema = @Schema(implementation = String.class))),
-            @ApiResponse(responseCode = "401", description = "Unauthorized (authentication required)"),
-            @ApiResponse(responseCode = "404", description = "User not found"),
-            @ApiResponse(responseCode = "500", description = "Internal server error")
-    })
-    @GetMapping("/firebase/{firebaseUID}")
-    public ResponseEntity<String> getUserUUIDByFirebaseUID(@PathVariable String firebaseUID) {
-        try {
-            UUID userUUID = usersController.getUserUUIDByFirebaseUID(firebaseUID);
-            if (userUUID != null) {
-                return ResponseEntity.ok(userUUID.toString());
-            } else {
-                return ResponseEntity.notFound().build();
-            }
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().build();
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-        }
-    }
 }

@@ -44,6 +44,21 @@ public class SecurityConfig {
         return new JwtAuthenticationFilter();
     }
 
+    /**
+     * Configures the security filter chain for HTTP requests.
+     * <p>
+     * - Disables CSRF protection.
+     * - Sets a custom authentication entry point for handling unauthorized access.
+     * - Configures session management to be stateless.
+     * - Permits access to API documentation endpoints.
+     * - Requires authentication for "/api/**" endpoints.
+     * - Permits all other requests.
+     * - Adds a JWT authentication filter before the username/password authentication filter.
+     *
+     * @param http the {@link HttpSecurity} to modify
+     * @return the configured {@link SecurityFilterChain}
+     * @throws Exception if an error occurs during configuration
+     */
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
@@ -60,6 +75,12 @@ public class SecurityConfig {
         return http.build();
     }
 
+    /**
+     * Configures CORS (Cross-Origin Resource Sharing) settings for the application.
+     * Allows all origins, methods, and headers.
+     *
+     * @return a WebMvcConfigurer with custom CORS mappings
+     */
     @Bean
     public WebMvcConfigurer corsConfigurer() {
         return new WebMvcConfigurer() {

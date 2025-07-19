@@ -74,8 +74,6 @@ public interface UsersRepository extends JpaRepository<UserEntity, UUID> {
             @Param("userUUID") UUID userUUID,
             @Param("subject") String subject);
 
-    Optional<UserEntity> findByFirebaseUid(String firebaseUid);
-
     @Query(value = """
             SELECT SUM(EXTRACT(EPOCH FROM (a_stop.created_at - a_start.created_at))) / 3600.0 AS total_hours
             FROM Activities a_start JOIN Activities a_stop ON a_start.tomato_id = a_stop.tomato_id

@@ -1,8 +1,8 @@
 package com.alessandra_alessandro.ketchapp.routes;
 
 import com.alessandra_alessandro.ketchapp.controllers.PlanBuilderControllers;
-import com.alessandra_alessandro.ketchapp.models.dto.planBuilderRequest.PlanBuilderRequestDto;
-import com.alessandra_alessandro.ketchapp.models.dto.planBuilderResponse.PlanBuilderResponseDto;
+import com.alessandra_alessandro.ketchapp.models.dto.PlanBuilderRequestDto;
+import com.alessandra_alessandro.ketchapp.models.dto.PlanBuilderResponseDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;

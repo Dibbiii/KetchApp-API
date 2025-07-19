@@ -36,6 +36,18 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         this.publicKey = loadPublicKey();
     }
 
+    /**
+     * Filters incoming HTTP requests to authenticate JWT tokens.
+     *
+     * Extracts the JWT from the Authorization header, validates it,
+     * and sets the authentication in the SecurityContext if valid.
+     *
+     * @param request the HTTP request
+     * @param response the HTTP response
+     * @param filterChain the filter chain
+     * @throws ServletException if a servlet error occurs
+     * @throws IOException if an I/O error occurs
+     */
     @Override
     protected void doFilterInternal(HttpServletRequest request,
                                     HttpServletResponse response,
@@ -60,6 +72,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         filterChain.doFilter(request, response);
     }
 
+    /**
+     * Extracts the JWT token from the Authorization header of the HTTP request.
+     *
+     * @param request the HTTP servlet request
+     * @return the JWT token if present and prefixed with "Bearer", otherwise null
+     */
     private String getJwtFromRequest(HttpServletRequest request) {
         String bearerToken = request.getHeader("Authorization");
         if (bearerToken != null && bearerToken.startsWith("Bearer ")) {
@@ -68,6 +86,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         return null;
     }
 
+    /**
+     * Extracts the username (subject) from the provided JWT token.
+     *
+     * @param token the JWT token
+     * @return the username (subject) contained in the token
+     * @throws UnsupportedJwtException if the token algorithm is not RS256
+     */
     public String getUsernameFromToken(String token) {
         Jws<Claims> jws = Jwts.parser()
                 .verifyWith(publicKey)
@@ -81,12 +106,21 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         return jws.getPayload().getSubject();
     }
 
+    /**
+     * Validates the provided JWT token.
+     * <p>
+     * Parses the token using the public key, checks if the algorithm is RS256,
+     * and handles possible exceptions such as malformed, expired, or unsupported tokens.
+     *
+     * @param authToken the JWT token to validate
+     * @return true if the token is valid and uses RS256, false otherwise
+     */
     public boolean validateToken(String authToken) {
         try {
             Jws<Claims> jws = Jwts.parser()
-                .verifyWith(publicKey)
-                .build()
-                .parseSignedClaims(authToken);
+                    .verifyWith(publicKey)
+                    .build()
+                    .parseSignedClaims(authToken);
 
             if (!"RS256".equals(jws.getHeader().getAlgorithm())) {
                 System.out.println("Invalid JWT algorithm: " + jws.getHeader().getAlgorithm() + ". Only RS256 is supported.");
@@ -106,6 +140,15 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         return false;
     }
 
+    /**
+     * Loads the RSA public key from the `public.pem` file located in the classpath.
+     * <p>
+     * Reads the PEM file, removes header and footer, decodes the Base64 content,
+     * and generates a `PublicKey` instance using the RSA algorithm.
+     *
+     * @return the loaded RSA public key
+     * @throws RuntimeException if the public key cannot be loaded or parsed
+     */
     private PublicKey loadPublicKey() {
         try {
             InputStream is = getClass().getClassLoader().getResourceAsStream("public.pem");

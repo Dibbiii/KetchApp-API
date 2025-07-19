@@ -5,7 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.sql.Timestamp;
+import jakarta.validation.constraints.*;
 import java.util.UUID;
 
 @Getter
@@ -13,10 +13,12 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 public class UserDto {
-
+    @NotNull(message = "{user.uuid.notnull}")
     private UUID uuid;
 
+    @NotBlank(message = "{user.username.notblank}")
     private String username;
 
+    @NotNull(message = "{user.totalHours.notnull}")
     private Double totalHours;
 }

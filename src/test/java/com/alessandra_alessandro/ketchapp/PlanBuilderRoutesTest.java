@@ -2,10 +2,8 @@ package com.alessandra_alessandro.ketchapp;
 
 import com.alessandra_alessandro.ketchapp.controllers.PlanBuilderControllers;
 import com.alessandra_alessandro.ketchapp.exceptions.GlobalExceptionHandler;
-import com.alessandra_alessandro.ketchapp.models.dto.planBuilderRequest.PlanBuilderRequestDto;
-import com.alessandra_alessandro.ketchapp.models.dto.planBuilderResponse.PlanBuilderResponseCalendarDto;
-import com.alessandra_alessandro.ketchapp.models.dto.planBuilderResponse.PlanBuilderResponseDto;
-import com.alessandra_alessandro.ketchapp.models.dto.planBuilderResponse.PlanBuilderResponseSubjectsDto;
+import com.alessandra_alessandro.ketchapp.models.dto.PlanBuilderRequestDto;
+import com.alessandra_alessandro.ketchapp.models.dto.PlanBuilderResponseDto;
 import com.alessandra_alessandro.ketchapp.routes.PlanBuilderRoutes;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
@@ -46,11 +44,11 @@ public class PlanBuilderRoutesTest {
     private ObjectMapper objectMapper;
 
     private PlanBuilderResponseDto createValidResponseDto() {
-        PlanBuilderResponseCalendarDto calendarDto = new PlanBuilderResponseCalendarDto();
+        PlanBuilderResponseDto.Calendar calendarDto = new PlanBuilderResponseDto.Calendar();
         calendarDto.setStart_at("2024-07-18T10:00:00");
         calendarDto.setEnd_at("2024-07-18T11:00:00");
         calendarDto.setTitle("Study Session");
-        PlanBuilderResponseSubjectsDto subjectDto = new PlanBuilderResponseSubjectsDto("subject", "1h");
+        PlanBuilderResponseDto.Subject subjectDto = new PlanBuilderResponseDto.Subject("subject", "1h");
         return new PlanBuilderResponseDto(
                 UUID.randomUUID(),
                 "60",

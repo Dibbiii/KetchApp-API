@@ -13,6 +13,12 @@ import java.util.Map;
 @ControllerAdvice
 public class GlobalExceptionHandler {
 
+    /**
+     * Handles validation exceptions thrown when method arguments annotated with @Valid fail validation.
+     *
+     * @param ex the MethodArgumentNotValidException containing validation errors
+     * @return a ResponseEntity with a map of field names to error messages and HTTP 400 status
+     */
     @ExceptionHandler(MethodArgumentNotValidException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ResponseEntity<Map<String, String>> handleValidationExceptions(MethodArgumentNotValidException ex) {

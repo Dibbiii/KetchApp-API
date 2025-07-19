@@ -29,15 +29,11 @@ public class UserEntity {
 
     private String email;
 
-    @Column(name = "firebase_uid")
-    private String firebaseUid;
-
     @Column(name = "created_at")
     private Timestamp createdAt = new Timestamp(System.currentTimeMillis());
 
-    public UserEntity(String firebaseUid, String email, String username) {
+    public UserEntity(String email, String username) {
         this.email = email;
-        this.firebaseUid = firebaseUid;
         this.username = username;
     }
 
