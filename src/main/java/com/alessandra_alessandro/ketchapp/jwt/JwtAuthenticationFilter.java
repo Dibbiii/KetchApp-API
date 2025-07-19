@@ -162,7 +162,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             KeyFactory keyFactory = KeyFactory.getInstance("RSA");
             return keyFactory.generatePublic(keySpec);
         } catch (Exception e) {
-            throw new RuntimeException("Errore nel caricamento della chiave pubblica", e);
+            throw new RuntimeException("Failed to load public key from PEM file", e);
         }
     }
 }
