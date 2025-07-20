@@ -20,7 +20,7 @@ import java.util.UUID;
 @AllArgsConstructor
 public class PlanBuilderResponseDto {
     @NotNull(message = "{planbuilder.userUUID.notnull}")
-    private UUID userUUID;
+    private UUID userId;
 
     @NotBlank(message = "{planbuilder.session.notblank}")
     private String session;

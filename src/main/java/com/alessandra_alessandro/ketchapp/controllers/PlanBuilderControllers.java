@@ -73,7 +73,7 @@ public class PlanBuilderControllers {
         }
 
         saveTomatoesFromGeminiResponse(dto, geminiResponse);
-        String userEmail = resolveUserEmail(dto.getUserUUID());
+        String userEmail = resolveUserEmail(dto.getUserId());
         sendEmailNotification(userEmail, geminiResponse);
         return ResponseEntity.ok(geminiResponse);
     }
@@ -98,7 +98,7 @@ public class PlanBuilderControllers {
                 log.info("Processing tomato: {}", tomato);
                 var tomatoDto = TomatoDto.fromPlanBuilderTomato(
                     tomato,
-                    dto.getUserUUID(),
+                    dto.getUserId(),
                     subject.getName(),
                     prevTomato != null ? prevTomato.getId() : null
                 );
