@@ -1,47 +1,52 @@
 package com.alessandra_alessandro.ketchapp.controllers;
 
-import com.alessandra_alessandro.ketchapp.utils.EntityMapper;
 import com.alessandra_alessandro.ketchapp.models.dto.PlanBuilderRequestDto;
 import com.alessandra_alessandro.ketchapp.models.dto.PlanBuilderResponseDto;
 import com.alessandra_alessandro.ketchapp.models.dto.TomatoDto;
-import com.alessandra_alessandro.ketchapp.utils.GeminiApi;
-import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Service;
-import org.springframework.beans.factory.annotation.Autowired;
-
 import com.alessandra_alessandro.ketchapp.models.entity.TomatoEntity;
 import com.alessandra_alessandro.ketchapp.models.entity.UserEntity;
 import com.alessandra_alessandro.ketchapp.repositories.TomatoesRepository;
 import com.alessandra_alessandro.ketchapp.repositories.UsersRepository;
-
+import com.alessandra_alessandro.ketchapp.utils.EntityMapper;
+import com.alessandra_alessandro.ketchapp.utils.GeminiApi;
+import jakarta.servlet.http.HttpServletRequest;
+import java.io.IOException;
 import java.net.URI;
+import java.net.URLEncoder;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.nio.charset.StandardCharsets;
 import java.sql.Timestamp;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.io.IOException;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Service;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
-import jakarta.servlet.http.HttpServletRequest;
 
 @Service
 public class PlanBuilderControllers {
-    private static final Logger log = LoggerFactory.getLogger(PlanBuilderControllers.class);
+
+    private static final Logger log = LoggerFactory.getLogger(
+        PlanBuilderControllers.class
+    );
     private final TomatoesRepository tomatoesRepository;
     private final UsersRepository usersRepository;
     private final GeminiApi geminiApi;
     private final EntityMapper entityMapper;
 
     @Autowired
-    public PlanBuilderControllers(TomatoesRepository tomatoesRepository, UsersRepository usersRepository, GeminiApi geminiApi, EntityMapper entityMapper) {
+    public PlanBuilderControllers(
+        TomatoesRepository tomatoesRepository,
+        UsersRepository usersRepository,
+        GeminiApi geminiApi,
+        EntityMapper entityMapper
+    ) {
         this.tomatoesRepository = tomatoesRepository;
         this.usersRepository = usersRepository;
         this.geminiApi = geminiApi;
@@ -56,7 +61,9 @@ public class PlanBuilderControllers {
      * @param dto DTO containing information for plan creation
      * @return ResponseEntity with the generated request DTO or error in case of failure
      */
-    public ResponseEntity<PlanBuilderRequestDto> createPlanBuilder(PlanBuilderResponseDto dto) {
+    public ResponseEntity<PlanBuilderRequestDto> createPlanBuilder(
+        PlanBuilderResponseDto dto
+    ) {
         log.info("Received PlanBuilderResponseDto: {}", dto);
         PlanBuilderRequestDto geminiResponse = geminiApi.ask(dto);
         log.info("Gemini API response: {}", geminiResponse);
@@ -77,7 +84,10 @@ public class PlanBuilderControllers {
      * @param dto            The DTO containing user information.
      * @param geminiResponse The response DTO from the Gemini API.
      */
-    private void saveTomatoesFromGeminiResponse(PlanBuilderResponseDto dto, PlanBuilderRequestDto geminiResponse) {
+    private void saveTomatoesFromGeminiResponse(
+        PlanBuilderResponseDto dto,
+        PlanBuilderRequestDto geminiResponse
+    ) {
         if (geminiResponse.getSubjects() == null) return;
         for (var subject : geminiResponse.getSubjects()) {
             log.info("Processing subject: {}", subject.getName());
@@ -86,13 +96,25 @@ public class PlanBuilderControllers {
             TomatoEntity prevTomato = null;
             for (PlanBuilderRequestDto.Tomato tomato : tomatoes) {
                 log.info("Processing tomato: {}", tomato);
-                var tomatoDto = TomatoDto.fromPlanBuilderTomato(tomato, dto.getUserUUID(), subject.getName(), prevTomato != null ? prevTomato.getId() : null);
-                TomatoEntity tomatoEntity = entityMapper.tomatoDtoToEntity(tomatoDto);
+                var tomatoDto = TomatoDto.fromPlanBuilderTomato(
+                    tomato,
+                    dto.getUserUUID(),
+                    subject.getName(),
+                    prevTomato != null ? prevTomato.getId() : null
+                );
+                TomatoEntity tomatoEntity = entityMapper.tomatoDtoToEntity(
+                    tomatoDto
+                );
                 log.info("Saving TomatoEntity: {}", tomatoEntity);
-                TomatoEntity savedTomato = tomatoesRepository.save(tomatoEntity);
+                TomatoEntity savedTomato = tomatoesRepository.save(
+                    tomatoEntity
+                );
                 if (prevTomato != null) {
                     prevTomato.setNextTomatoId(savedTomato.getId());
-                    log.info("Updating prevTomato with nextTomatoId: {}", savedTomato.getId());
+                    log.info(
+                        "Updating prevTomato with nextTomatoId: {}",
+                        savedTomato.getId()
+                    );
                     tomatoesRepository.save(prevTomato);
                 }
                 prevTomato = savedTomato;
@@ -100,14 +122,14 @@ public class PlanBuilderControllers {
         }
     }
 
-
     /**
      * Resolves the user's email address from the user UUID.
      */
     private String resolveUserEmail(java.util.UUID userUUID) {
-        String userEmail = usersRepository.findById(userUUID)
-                .map(UserEntity::getEmail)
-                .orElse("");
+        String userEmail = usersRepository
+            .findById(userUUID)
+            .map(UserEntity::getEmail)
+            .orElse("");
         log.info("User email resolved: {}", userEmail);
         return userEmail;
     }
@@ -118,33 +140,56 @@ public class PlanBuilderControllers {
      * @param userEmail      The email address of the user.
      * @param geminiResponse The response DTO from the Gemini API.
      */
-    private void sendEmailNotification(String userEmail, PlanBuilderRequestDto geminiResponse) {
+    private void sendEmailNotification(
+        String userEmail,
+        PlanBuilderRequestDto geminiResponse
+    ) {
         // Sanitize email: trim whitespace and remove newlines
-        String cleanEmail = userEmail == null ? "" : userEmail.trim().replaceAll("[\r\n]+", "");
-        String mailUrl = "http://151.61.228.91:8082/api/mail/" + URLEncoder.encode(cleanEmail, StandardCharsets.UTF_8);
-        log.info("Sending email request to: {} with payload: {}", mailUrl, geminiResponse.toJson());
+        String cleanEmail = userEmail == null
+            ? ""
+            : userEmail.trim().replaceAll("[\r\n]+", "");
+        String mailUrl =
+            "http://151.61.228.91:8082/api/mail/" +
+            URLEncoder.encode(cleanEmail, StandardCharsets.UTF_8);
+        log.info(
+            "Sending email request to: {} with payload: {}",
+            mailUrl,
+            geminiResponse.toJson()
+        );
 
         // Retrieve JWT from the current request context
         String jwt = getCurrentJwtToken();
         if (jwt == null || jwt.isEmpty()) {
-            log.error("JWT token not found in the current request context. Email will not be sent.");
+            log.error(
+                "JWT token not found in the current request context. Email will not be sent."
+            );
             return;
         }
 
         HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(mailUrl))
-                .header("Content-Type", "application/json")
-                .header("Authorization", "Bearer " + jwt)
-                .POST(HttpRequest.BodyPublishers.ofString(geminiResponse.toJson()))
-                .build();
+            .uri(URI.create(mailUrl))
+            .header("Content-Type", "application/json")
+            .header("Authorization", "Bearer " + jwt)
+            .POST(HttpRequest.BodyPublishers.ofString(geminiResponse.toJson()))
+            .build();
 
         try {
             HttpClient client = HttpClient.newHttpClient();
             log.info("Sending email notification request...");
-            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-            log.info("Email notification response status: {}, body: {}", response.statusCode(), response.body());
+            HttpResponse<String> response = client.send(
+                request,
+                HttpResponse.BodyHandlers.ofString()
+            );
+            log.info(
+                "Email notification response status: {}, body: {}",
+                response.statusCode(),
+                response.body()
+            );
             if (response.statusCode() != 200) {
-                log.error("Error sending email notification: {}", response.body());
+                log.error(
+                    "Error sending email notification: {}",
+                    response.body()
+                );
             } else {
                 log.info("Email notification sent successfully.");
             }
@@ -156,7 +201,8 @@ public class PlanBuilderControllers {
     private String getCurrentJwtToken() {
         // Retrieve the JWT from the current HTTP request header
         try {
-            ServletRequestAttributes attr = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+            ServletRequestAttributes attr =
+                (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
             if (attr == null) return null;
             HttpServletRequest request = attr.getRequest();
             String authHeader = request.getHeader("Authorization");
@@ -167,30 +213,6 @@ public class PlanBuilderControllers {
         } catch (Exception e) {
             log.error("Could not extract JWT from HTTP request", e);
             return null;
-        }
-    }
-
-    /**
-     * Converts an ISO 8601 formatted string to a Timestamp object.
-     * Supports strings with 'Z' (UTC), with 'T' (LocalDateTime), or plain timestamp strings.
-     *
-     * @param isoString the ISO 8601 formatted string to convert
-     * @return the corresponding Timestamp, or null if the string is empty or null
-     * @throws IllegalArgumentException if the string is not in a valid format
-     */
-    private Timestamp parseIsoToTimestamp(String isoString) {
-        if (isoString == null || isoString.isEmpty()) return null;
-        try {
-            if (isoString.endsWith("Z")) {
-                return Timestamp.from(Instant.parse(isoString));
-            } else if (isoString.contains("T")) {
-                LocalDateTime ldt = LocalDateTime.parse(isoString, DateTimeFormatter.ISO_LOCAL_DATE_TIME);
-                return Timestamp.valueOf(ldt);
-            } else {
-                return Timestamp.valueOf(isoString);
-            }
-        } catch (Exception e) {
-            throw new IllegalArgumentException("Invalid timestamp string: " + isoString, e);
         }
     }
 }

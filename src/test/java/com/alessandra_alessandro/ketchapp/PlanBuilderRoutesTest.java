@@ -1,7 +1,7 @@
 package com.alessandra_alessandro.ketchapp;
 
+import com.alessandra_alessandro.ketchapp.config.GlobalExceptionHandler;
 import com.alessandra_alessandro.ketchapp.controllers.PlanBuilderControllers;
-import com.alessandra_alessandro.ketchapp.exceptions.GlobalExceptionHandler;
 import com.alessandra_alessandro.ketchapp.models.dto.PlanBuilderRequestDto;
 import com.alessandra_alessandro.ketchapp.models.dto.PlanBuilderResponseDto;
 import com.alessandra_alessandro.ketchapp.routes.PlanBuilderRoutes;
