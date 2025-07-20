@@ -28,6 +28,9 @@ import java.nio.charset.StandardCharsets;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
+import jakarta.servlet.http.HttpServletRequest;
 
 @Service
 public class PlanBuilderControllers {
@@ -55,7 +58,7 @@ public class PlanBuilderControllers {
      */
     public ResponseEntity<PlanBuilderRequestDto> createPlanBuilder(PlanBuilderResponseDto dto) {
         log.info("Received PlanBuilderResponseDto: {}", dto);
-        PlanBuilderRequestDto geminiResponse = (PlanBuilderRequestDto) geminiApi.ask(dto);
+        PlanBuilderRequestDto geminiResponse = geminiApi.ask(dto);
         log.info("Gemini API response: {}", geminiResponse);
         if (geminiResponse == null) {
             log.info("Gemini response is null, returning bad request");
@@ -116,11 +119,22 @@ public class PlanBuilderControllers {
      * @param geminiResponse The response DTO from the Gemini API.
      */
     private void sendEmailNotification(String userEmail, PlanBuilderRequestDto geminiResponse) {
-        String mailUrl = "http://151.61.228.91:8082/api/mail/" + URLEncoder.encode(userEmail, StandardCharsets.UTF_8);
+        // Sanitize email: trim whitespace and remove newlines
+        String cleanEmail = userEmail == null ? "" : userEmail.trim().replaceAll("[\r\n]+", "");
+        String mailUrl = "http://151.61.228.91:8082/api/mail/" + URLEncoder.encode(cleanEmail, StandardCharsets.UTF_8);
         log.info("Sending email request to: {} with payload: {}", mailUrl, geminiResponse.toJson());
+
+        // Retrieve JWT from the current request context
+        String jwt = getCurrentJwtToken();
+        if (jwt == null || jwt.isEmpty()) {
+            log.error("JWT token not found in the current request context. Email will not be sent.");
+            return;
+        }
+
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(mailUrl))
                 .header("Content-Type", "application/json")
+                .header("Authorization", "Bearer " + jwt)
                 .POST(HttpRequest.BodyPublishers.ofString(geminiResponse.toJson()))
                 .build();
 
@@ -136,6 +150,23 @@ public class PlanBuilderControllers {
             }
         } catch (IOException | InterruptedException e) {
             log.error("Exception sending email notification", e);
+        }
+    }
+
+    private String getCurrentJwtToken() {
+        // Retrieve the JWT from the current HTTP request header
+        try {
+            ServletRequestAttributes attr = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+            if (attr == null) return null;
+            HttpServletRequest request = attr.getRequest();
+            String authHeader = request.getHeader("Authorization");
+            if (authHeader != null && authHeader.startsWith("Bearer ")) {
+                return authHeader.substring(7);
+            }
+            return null;
+        } catch (Exception e) {
+            log.error("Could not extract JWT from HTTP request", e);
+            return null;
         }
     }
 
