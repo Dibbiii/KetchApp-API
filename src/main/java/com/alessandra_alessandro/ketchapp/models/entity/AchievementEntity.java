@@ -31,8 +31,8 @@ public class AchievementEntity {
 
     private Boolean completed;
 
-    public AchievementEntity(UUID uuid, String s, boolean tomatoCompleted) {
-        this.userUUID = uuid;
+    public AchievementEntity(UUID id, String s, boolean tomatoCompleted) {
+        this.userUUID = id;
         this.description = s;
         this.createdAt = Timestamp.from(java.time.Instant.now());
         this.completed = tomatoCompleted;

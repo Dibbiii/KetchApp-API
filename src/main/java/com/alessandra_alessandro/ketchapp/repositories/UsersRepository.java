@@ -46,11 +46,11 @@ public interface UsersRepository extends JpaRepository<UserEntity, UUID> {
             @Param("date") String date);
 
     @Query(value = """
-            SELECT u.uuid, u.username, COALESCE(SUM(EXTRACT(EPOCH FROM (a_stop.created_at - a_start.created_at)) / 3600.0), 0) AS total_hours
+            SELECT u.id, u.username, COALESCE(SUM(EXTRACT(EPOCH FROM (a_stop.created_at - a_start.created_at)) / 3600.0), 0) AS total_hours
             FROM Users u
-            LEFT JOIN Activities a_start ON u.uuid = a_start.user_uuid AND a_start.type = 'TIMER' AND a_start.action = 'START'
+            LEFT JOIN Activities a_start ON u.id = a_start.user_uuid AND a_start.type = 'TIMER' AND a_start.action = 'START'
             LEFT JOIN Activities a_stop ON a_start.tomato_id = a_stop.tomato_id AND a_stop.type = 'TIMER' AND a_stop.action = 'END'
-            GROUP BY u.uuid, u.username
+            GROUP BY u.id, u.username
             ORDER BY total_hours DESC
             LIMIT 100
             """, nativeQuery = true)

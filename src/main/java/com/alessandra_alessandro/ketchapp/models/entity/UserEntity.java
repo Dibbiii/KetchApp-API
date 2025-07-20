@@ -23,7 +23,7 @@ import java.util.UUID;
 public class UserEntity {
 
     @Id
-    private UUID uuid = UUID.randomUUID();
+    private UUID id = UUID.randomUUID();
 
     private String username;
 
@@ -38,7 +38,7 @@ public class UserEntity {
     }
 
     public UserEntity(UUID uuid, String username) {
-        this.uuid = uuid;
+        this.id = uuid;
         this.username = username;
     }
 }

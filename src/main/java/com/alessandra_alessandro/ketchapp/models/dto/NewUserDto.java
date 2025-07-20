@@ -1,18 +1,14 @@
 package com.alessandra_alessandro.ketchapp.models.dto;
 
 import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
-import java.util.UUID;
-
-@Getter
-@Setter
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserDto {
-    private UUID id;
+public class NewUserDto {
+    private String id;
     private String username;
-    private Double totalHours;
+    private String email;
 }

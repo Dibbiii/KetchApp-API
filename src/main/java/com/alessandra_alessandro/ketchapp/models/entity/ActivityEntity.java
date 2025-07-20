@@ -39,8 +39,8 @@ public class ActivityEntity {
     @Column(name = "created_at")
     private Timestamp createdAt = new Timestamp(System.currentTimeMillis());
 
-    public ActivityEntity(UUID uuid, Integer tomatoId, ActivityType type, ActivityAction action) {
-        this.userUUID = uuid;
+    public ActivityEntity(UUID id, Integer tomatoId, ActivityType type, ActivityAction action) {
+        this.userUUID = id;
         this.tomatoId = tomatoId;
         this.type = type;
         this.action = action;

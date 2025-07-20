@@ -43,7 +43,7 @@ public class UsersControllers {
         List<UserDto> users = new ArrayList<>();
         for (Object[] row : results) {
             UserDto userDto = new UserDto();
-            userDto.setUuid(row[0] != null ? UUID.fromString(row[0].toString()) : null);
+            userDto.setId(row[0] != null ? UUID.fromString(row[0].toString()) : null);
             userDto.setUsername(row[1] != null ? row[1].toString() : null);
             userDto.setTotalHours(row[2] != null ? ((Number) row[2]).doubleValue() : 0.0);
             users.add(userDto);
@@ -295,5 +295,30 @@ public class UsersControllers {
         statisticsDto.setDates(statisticsDates);
         log.info("Returning statisticsDto for user {}: {}", uuid, statisticsDto);
         return statisticsDto;
+    }
+
+    /**
+     * Creates a new user from a UserDto.
+     *
+     * @param newUserDto the user data to create
+     * @return the created UserDto
+     * @throws IllegalArgumentException if username or email is missing or already exists
+     */
+    public NewUserDto createUser(NewUserDto newUserDto) {
+        log.info("Creating user: {}", newUserDto.getUsername());
+        if (newUserDto.getUsername() == null || newUserDto.getUsername().isBlank()) {
+            log.error("Username cannot be null or blank");
+            throw new IllegalArgumentException("Username cannot be null or blank");
+        }
+        if (usersRepository.findByUsername(newUserDto.getUsername()).isPresent()) {
+            log.error("Username '{}' already exists", newUserDto.getUsername());
+            throw new IllegalArgumentException("Username already exists");
+        }
+        UserEntity entity = new UserEntity();
+        entity.setUsername(newUserDto.getUsername());
+        entity.setEmail(newUserDto.getEmail());
+        UserEntity saved = usersRepository.save(entity);
+        log.info("User created with UUID: {}", saved.getId());
+        return new NewUserDto(saved.getId().toString(), saved.getUsername(), saved.getEmail());
     }
 }
