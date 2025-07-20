@@ -4,20 +4,15 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.util.List;
 
-@Getter
-@Setter
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class PlanBuilderRequestDto {
-    @Getter
-    @Setter
+    @Data
     @NoArgsConstructor
     @AllArgsConstructor
     public static class Calendar {
@@ -30,8 +25,7 @@ public class PlanBuilderRequestDto {
         private String end_at;
     }
 
-    @Getter
-    @Setter
+    @Data
     @NoArgsConstructor
     @AllArgsConstructor
     public static class Tomato {
@@ -43,8 +37,7 @@ public class PlanBuilderRequestDto {
         private String pause_end_at;
     }
 
-    @Getter
-    @Setter
+    @Data
     @NoArgsConstructor
     @AllArgsConstructor
     public static class Subject {
