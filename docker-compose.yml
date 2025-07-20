@@ -1,0 +1,8 @@
+version: '3.8'
+services:
+  ketchapp-api:
+    build: .
+    ports:
+      - "8081:8081"
+    environment:
+      - GEMINI_API_KEY=AIzaSyClXWWxzTCaB6mMZl1Uqcr_3Pe2xZgFHyE
