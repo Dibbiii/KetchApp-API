@@ -19,7 +19,7 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.LocalDate;
 
-import com.alessandra_alessandro.ketchapp.utils.schema.Schema;
+import com.alessandra_alessandro.ketchapp.models.Schema;
 
 import java.util.HashMap;
 import java.util.Arrays;

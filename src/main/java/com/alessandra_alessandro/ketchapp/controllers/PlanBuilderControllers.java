@@ -1,8 +1,9 @@
 package com.alessandra_alessandro.ketchapp.controllers;
 
-import com.alessandra_alessandro.ketchapp.models.dto.AchievementDto;
+import com.alessandra_alessandro.ketchapp.utils.EntityMapper;
 import com.alessandra_alessandro.ketchapp.models.dto.PlanBuilderRequestDto;
 import com.alessandra_alessandro.ketchapp.models.dto.PlanBuilderResponseDto;
+import com.alessandra_alessandro.ketchapp.models.dto.TomatoDto;
 import com.alessandra_alessandro.ketchapp.utils.GeminiApi;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -34,12 +35,14 @@ public class PlanBuilderControllers {
     private final TomatoesRepository tomatoesRepository;
     private final UsersRepository usersRepository;
     private final GeminiApi geminiApi;
+    private final EntityMapper entityMapper;
 
     @Autowired
-    public PlanBuilderControllers(TomatoesRepository tomatoesRepository, UsersRepository usersRepository, GeminiApi geminiApi) {
+    public PlanBuilderControllers(TomatoesRepository tomatoesRepository, UsersRepository usersRepository, GeminiApi geminiApi, EntityMapper entityMapper) {
         this.tomatoesRepository = tomatoesRepository;
         this.usersRepository = usersRepository;
         this.geminiApi = geminiApi;
+        this.entityMapper = entityMapper;
     }
 
     /**
@@ -51,11 +54,11 @@ public class PlanBuilderControllers {
      * @return ResponseEntity with the generated request DTO or error in case of failure
      */
     public ResponseEntity<PlanBuilderRequestDto> createPlanBuilder(PlanBuilderResponseDto dto) {
-        log.debug("Received PlanBuilderResponseDto: {}", dto);
+        log.info("Received PlanBuilderResponseDto: {}", dto);
         PlanBuilderRequestDto geminiResponse = (PlanBuilderRequestDto) geminiApi.ask(dto);
-        log.debug("Gemini API response: {}", geminiResponse);
+        log.info("Gemini API response: {}", geminiResponse);
         if (geminiResponse == null) {
-            log.debug("Gemini response is null, returning bad request");
+            log.info("Gemini response is null, returning bad request");
             return ResponseEntity.badRequest().build();
         }
 
@@ -74,18 +77,19 @@ public class PlanBuilderControllers {
     private void saveTomatoesFromGeminiResponse(PlanBuilderResponseDto dto, PlanBuilderRequestDto geminiResponse) {
         if (geminiResponse.getSubjects() == null) return;
         for (var subject : geminiResponse.getSubjects()) {
-            log.debug("Processing subject: {}", subject.getName());
+            log.info("Processing subject: {}", subject.getName());
             var tomatoes = subject.getTomatoes();
             if (tomatoes == null) continue;
             TomatoEntity prevTomato = null;
             for (PlanBuilderRequestDto.Tomato tomato : tomatoes) {
-                log.debug("Processing tomato: {}", tomato);
-                TomatoEntity tomatoEntity = createTomatoEntity(dto, tomato, subject.getName(), prevTomato);
-                log.debug("Saving TomatoEntity: {}", tomatoEntity);
+                log.info("Processing tomato: {}", tomato);
+                var tomatoDto = TomatoDto.fromPlanBuilderTomato(tomato, dto.getUserUUID(), subject.getName(), prevTomato != null ? prevTomato.getId() : null);
+                TomatoEntity tomatoEntity = entityMapper.tomatoDtoToEntity(tomatoDto);
+                log.info("Saving TomatoEntity: {}", tomatoEntity);
                 TomatoEntity savedTomato = tomatoesRepository.save(tomatoEntity);
                 if (prevTomato != null) {
                     prevTomato.setNextTomatoId(savedTomato.getId());
-                    log.debug("Updating prevTomato with nextTomatoId: {}", savedTomato.getId());
+                    log.info("Updating prevTomato with nextTomatoId: {}", savedTomato.getId());
                     tomatoesRepository.save(prevTomato);
                 }
                 prevTomato = savedTomato;
@@ -93,19 +97,6 @@ public class PlanBuilderControllers {
         }
     }
 
-    /**
-     * Creates a TomatoEntity from the provided data.
-     */
-    private TomatoEntity createTomatoEntity(PlanBuilderResponseDto dto, PlanBuilderRequestDto.Tomato tomato, String subjectName, TomatoEntity prevTomato) {
-        return new TomatoEntity(
-                dto.getUserUUID(),
-                parseIsoToTimestamp(tomato.getStart_at()),
-                parseIsoToTimestamp(tomato.getEnd_at()),
-                parseIsoToTimestamp(tomato.getPause_end_at()),
-                prevTomato != null ? prevTomato.getId() : null,
-                subjectName
-        );
-    }
 
     /**
      * Resolves the user's email address from the user UUID.
@@ -114,7 +105,7 @@ public class PlanBuilderControllers {
         String userEmail = usersRepository.findById(userUUID)
                 .map(UserEntity::getEmail)
                 .orElse("");
-        log.debug("User email resolved: {}", userEmail);
+        log.info("User email resolved: {}", userEmail);
         return userEmail;
     }
 
@@ -126,7 +117,7 @@ public class PlanBuilderControllers {
      */
     private void sendEmailNotification(String userEmail, PlanBuilderRequestDto geminiResponse) {
         String mailUrl = "http://151.61.228.91:8082/api/mail/" + URLEncoder.encode(userEmail, StandardCharsets.UTF_8);
-        log.debug("Sending email request to: {} with payload: {}", mailUrl, geminiResponse.toJson());
+        log.info("Sending email request to: {} with payload: {}", mailUrl, geminiResponse.toJson());
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(mailUrl))
                 .header("Content-Type", "application/json")
@@ -135,9 +126,9 @@ public class PlanBuilderControllers {
 
         try {
             HttpClient client = HttpClient.newHttpClient();
-            log.debug("Sending email notification request...");
+            log.info("Sending email notification request...");
             HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-            log.debug("Email notification response status: {}, body: {}", response.statusCode(), response.body());
+            log.info("Email notification response status: {}, body: {}", response.statusCode(), response.body());
             if (response.statusCode() != 200) {
                 log.error("Error sending email notification: {}", response.body());
             } else {

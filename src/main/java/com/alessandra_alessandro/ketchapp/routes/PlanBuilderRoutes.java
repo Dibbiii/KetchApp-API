@@ -23,7 +23,11 @@ public class PlanBuilderRoutes {
         this.planBuilderControllers = planBuilderControllers;
     }
 
-    @Operation(summary = "Create a new plan builder", description = "Creates a new plan builder with the provided details.")
+    @Operation(
+            summary = "Create a new plan builder",
+            description = "Creates a new plan builder with the provided details.",
+            tags = {"Plan Builder"}
+    )
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successfully retrieved plans",
                     content = @Content(mediaType = "application/json",

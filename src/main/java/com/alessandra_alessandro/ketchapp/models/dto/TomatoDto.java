@@ -35,4 +35,17 @@ public class TomatoDto implements Serializable {
 
     @NotNull(message = "{tomato.createdAt.notnull}")
     private Timestamp createdAt;
+
+    public static TomatoDto fromPlanBuilderTomato(PlanBuilderRequestDto.Tomato tomato, UUID userUUID, String subject, Integer previousTomatoId) {
+        TomatoDto dto = new TomatoDto();
+        dto.setId(null);
+        dto.setUserUUID(userUUID);
+        dto.setStartAt(Timestamp.valueOf(tomato.getStart_at().replace("T", " ").replace("Z", "")));
+        dto.setEndAt(Timestamp.valueOf(tomato.getEnd_at().replace("T", " ").replace("Z", "")));
+        dto.setPauseEnd(Timestamp.valueOf(tomato.getPause_end_at().replace("T", " ").replace("Z", "")));
+        dto.setNextTomatoId(null);
+        dto.setSubject(subject);
+        dto.setCreatedAt(new Timestamp(System.currentTimeMillis()));
+        return dto;
+    }
 }

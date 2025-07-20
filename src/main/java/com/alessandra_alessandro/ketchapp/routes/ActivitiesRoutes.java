@@ -22,7 +22,11 @@ public class ActivitiesRoutes {
         this.activitiesController = activitiesController;
     }
 
-    @Operation(summary = "Create a new activity", description = "Creates a new activity record.")
+    @Operation(
+            summary = "Create a new activity",
+            description = "Creates a new activity record.",
+            tags = {"Activities"}
+    )
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "Successfully created achievement record",
                     content = @Content(mediaType = "application/json",

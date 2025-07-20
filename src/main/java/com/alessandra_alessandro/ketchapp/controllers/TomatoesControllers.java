@@ -6,6 +6,7 @@ import com.alessandra_alessandro.ketchapp.models.entity.ActivityEntity;
 import com.alessandra_alessandro.ketchapp.models.entity.TomatoEntity;
 import com.alessandra_alessandro.ketchapp.repositories.ActivitiesRepository;
 import com.alessandra_alessandro.ketchapp.repositories.TomatoesRepository;
+import com.alessandra_alessandro.ketchapp.utils.EntityMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.slf4j.Logger;
@@ -18,53 +19,13 @@ public class TomatoesControllers {
     private static final Logger log = LoggerFactory.getLogger(TomatoesControllers.class);
     final TomatoesRepository tomatoesRepository;
     private final ActivitiesRepository activitiesRepository;
+    private final EntityMapper entityMapper;
 
     @Autowired
-    public TomatoesControllers(TomatoesRepository tomatoesRepository, ActivitiesRepository activitiesRepository) {
+    public TomatoesControllers(TomatoesRepository tomatoesRepository, ActivitiesRepository activitiesRepository, EntityMapper entityMapper) {
         this.tomatoesRepository = tomatoesRepository;
         this.activitiesRepository = activitiesRepository;
-    }
-
-    /**
-     * Converts a TomatoEntity object to a TomatoDto object.
-     *
-     * @param entity the TomatoEntity to convert
-     * @return the corresponding TomatoDto, or null if the entity is null
-     */
-    public TomatoDto convertEntityToDto(TomatoEntity entity) {
-        if (entity == null) {
-            return null;
-        }
-        return new TomatoDto(
-                entity.getId(),
-                entity.getUserUUID(),
-                entity.getStartAt(),
-                entity.getEndAt(),
-                entity.getPauseEnd(),
-                entity.getNextTomatoId(),
-                entity.getSubject(),
-                entity.getCreatedAt()
-        );
-    }
-
-    /**
-     * Converts a TomatoDto object to a TomatoEntity object.
-     *
-     * @param dto the TomatoDto to convert
-     * @return the corresponding TomatoEntity, or null if the dto is null
-     */
-    public TomatoEntity convertDtoToEntity(TomatoDto dto) {
-        if (dto == null) {
-            return null;
-        }
-        return new TomatoEntity(
-                dto.getUserUUID(),
-                dto.getStartAt(),
-                dto.getEndAt(),
-                dto.getPauseEnd(),
-                dto.getNextTomatoId(),
-                dto.getSubject()
-        );
+        this.entityMapper = entityMapper;
     }
 
     /**
@@ -76,17 +37,17 @@ public class TomatoesControllers {
      * @throws IllegalArgumentException if the tomatoDto parameter is null
      */
     public TomatoDto createTomato(TomatoDto tomatoDto) {
-        log.debug("Received TomatoDto for creation: {}", tomatoDto);
+        log.info("Received TomatoDto for creation: {}", tomatoDto);
         if (tomatoDto == null) {
             log.error("TomatoDto cannot be null");
             throw new IllegalArgumentException("TomatoDto cannot be null");
         }
-        TomatoEntity tomatoEntity = convertDtoToEntity(tomatoDto);
-        log.debug("Converted TomatoDto to TomatoEntity: {}", tomatoEntity);
+        TomatoEntity tomatoEntity = entityMapper.tomatoDtoToEntity(tomatoDto);
+        log.info("Converted TomatoDto to TomatoEntity: {}", tomatoEntity);
         TomatoEntity savedTomato = tomatoesRepository.save(tomatoEntity);
-        log.debug("Saved TomatoEntity: {}", savedTomato);
-        TomatoDto result = convertEntityToDto(savedTomato);
-        log.debug("Converted saved TomatoEntity to TomatoDto: {}", result);
+        log.info("Saved TomatoEntity: {}", savedTomato);
+        TomatoDto result = entityMapper.tomatoEntityToDto(savedTomato);
+        log.info("Converted saved TomatoEntity to TomatoDto: {}", result);
         return result;
     }
 
@@ -97,20 +58,13 @@ public class TomatoesControllers {
      * @return list of ActivityDto linked to the specified tomato
      */
     public List<ActivityDto> getActivitiesByTomatoId(Integer tomatoId) {
-        log.debug("Fetching activities for tomatoId: {}", tomatoId);
+        log.info("Fetching activities for tomatoId: {}", tomatoId);
         List<ActivityEntity> activities = activitiesRepository.findByTomatoId(tomatoId);
-        log.debug("Found {} activities for tomatoId {}", activities.size(), tomatoId);
+        log.info("Found {} activities for tomatoId {}", activities.size(), tomatoId);
         List<ActivityDto> result = activities.stream()
-                .map(a -> new ActivityDto(
-                        a.getId(),
-                        a.getUserUUID(),
-                        a.getTomatoId(),
-                        a.getType(),
-                        a.getAction(),
-                        a.getCreatedAt()
-                ))
+                .map(entityMapper::activityEntityToDto)
                 .collect(java.util.stream.Collectors.toList());
-        log.debug("Mapped activities to ActivityDto list: {}", result);
+        log.info("Mapped activities to ActivityDto list: {}", result);
         return result;
     }
 }

@@ -1,24 +1,19 @@
-package com.alessandra_alessandro.ketchapp.utils.schema;
+package com.alessandra_alessandro.ketchapp.models;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.util.List;
 import java.util.Map;
 
 public class Schema {
-    @Getter
-    @Setter
+    @Data
     @NoArgsConstructor
     @AllArgsConstructor
     public static class PropertySchema {
         private String type;
     }
 
-    @Getter
-    @Setter
+    @Data
     @NoArgsConstructor
     @AllArgsConstructor
     public static class ArraySchema {
@@ -29,8 +24,7 @@ public class Schema {
         }
     }
 
-    @Getter
-    @Setter
+    @Data
     @NoArgsConstructor
     @AllArgsConstructor
     public static class ObjectSchema {

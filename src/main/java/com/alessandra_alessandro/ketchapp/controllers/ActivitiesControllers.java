@@ -3,6 +3,7 @@ package com.alessandra_alessandro.ketchapp.controllers;
 import com.alessandra_alessandro.ketchapp.models.dto.ActivityDto;
 import com.alessandra_alessandro.ketchapp.models.entity.ActivityEntity;
 import com.alessandra_alessandro.ketchapp.repositories.ActivitiesRepository;
+import com.alessandra_alessandro.ketchapp.utils.EntityMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.slf4j.Logger;
@@ -12,48 +13,12 @@ import org.slf4j.LoggerFactory;
 public class ActivitiesControllers {
     private static final Logger log = LoggerFactory.getLogger(ActivitiesControllers.class);
     private final ActivitiesRepository activitiesRepository;
+    private final EntityMapper entityMapper;
 
     @Autowired
-    public ActivitiesControllers(ActivitiesRepository activitiesRepository) {
+    public ActivitiesControllers(ActivitiesRepository activitiesRepository, EntityMapper entityMapper) {
         this.activitiesRepository = activitiesRepository;
-    }
-
-    /**
-     * Converts an ActivityEntity object to an ActivityDto object.
-     *
-     * @param entity the ActivityEntity object to convert
-     * @return the resulting ActivityDto, or null if the entity is null
-     */
-    private ActivityDto convertEntityToDto(ActivityEntity entity) {
-        if (entity == null) {
-            return null;
-        }
-        return new ActivityDto(
-                entity.getId(),
-                entity.getUserUUID(),
-                entity.getTomatoId(),
-                entity.getType(),
-                entity.getAction(),
-                entity.getCreatedAt()
-        );
-    }
-
-    /**
-     * Converts an ActivityDto object to an ActivityEntity object.
-     *
-     * @param dto the ActivityDto object to convert
-     * @return the resulting ActivityEntity, or null if the dto is null
-     */
-    private ActivityEntity convertDtoToEntity(ActivityDto dto) {
-        if (dto == null) {
-            return null;
-        }
-        return new ActivityEntity(
-                dto.getUserUUID(),
-                dto.getTomatoId(),
-                dto.getType(),
-                dto.getAction()
-        );
+        this.entityMapper = entityMapper;
     }
 
     /**
@@ -66,18 +31,18 @@ public class ActivitiesControllers {
      * @throws IllegalArgumentException if activityDto or userUUID are null
      */
     public ActivityDto createActivity(ActivityDto activityDto) {
-        log.debug("Received ActivityDto for creation: {}", activityDto);
+        log.info("Received ActivityDto for creation: {}", activityDto);
         if (activityDto == null || activityDto.getUserUUID() == null) {
             log.error("Activity data or user UUID cannot be null");
             throw new IllegalArgumentException("Activity data or user UUID cannot be null");
         }
-        log.debug("Converting ActivityDto to ActivityEntity");
-        ActivityEntity activityEntity = convertDtoToEntity(activityDto);
-        log.debug("Saving ActivityEntity to repository: {}", activityEntity);
+        log.info("Converting ActivityDto to ActivityEntity");
+        ActivityEntity activityEntity = entityMapper.activityDtoToEntity(activityDto);
+        log.info("Saving ActivityEntity to repository: {}", activityEntity);
         activityEntity = activitiesRepository.save(activityEntity);
-        log.debug("Saved ActivityEntity: {}", activityEntity);
-        ActivityDto result = convertEntityToDto(activityEntity);
-        log.debug("Converted saved ActivityEntity to ActivityDto: {}", result);
+        log.info("Saved ActivityEntity: {}", activityEntity);
+        ActivityDto result = entityMapper.activityEntityToDto(activityEntity);
+        log.info("Converted saved ActivityEntity to ActivityDto: {}", result);
         return result;
     }
 }

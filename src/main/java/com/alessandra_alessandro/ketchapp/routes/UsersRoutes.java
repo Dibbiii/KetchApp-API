@@ -28,7 +28,11 @@ public class UsersRoutes {
     }
 
 
-    @Operation(summary = "Get all users", description = "Fetches a list of all user records.")
+    @Operation(
+            summary = "Get all users",
+            description = "Fetches a list of all user records.",
+            tags = {"Users"})
+
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successfully retrieved user records",
                     content = @Content(mediaType = "application/json",
@@ -46,29 +50,11 @@ public class UsersRoutes {
         }
     }
 
-    @Operation(summary = "Create a new user", description = "Creates a new user record in the database.")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "201", description = "Successfully created user record",
-                    content = @Content(mediaType = "application/json",
-                            schema = @Schema(implementation = UserDto.class))),
-            @ApiResponse(responseCode = "400", description = "Bad request (e.g., invalid data)"),
-            @ApiResponse(responseCode = "401", description = "Unauthorized (authentication required)"),
-            @ApiResponse(responseCode = "409", description = "Conflict (e.g., username already exists)"),
-            @ApiResponse(responseCode = "500", description = "Internal server error")
-    })
-    @PostMapping
-    public ResponseEntity<UserDto> createUser(@RequestBody UserDto userDtoToCreate) {
-        try {
-            UserDto createdUser = usersController.createUser(userDtoToCreate);
-            return ResponseEntity.status(HttpStatus.CREATED).body(createdUser);
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().build();
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-        }
-    }
-
-    @Operation(summary = "Get user by UUID", description = "Fetches a user record by its UUID.")
+    @Operation(
+            summary = "Get user by UUID",
+            description = "Fetches a user record by its UUID.",
+            tags = {"Users"}
+    )
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successfully retrieved user record",
                     content = @Content(mediaType = "application/json",
@@ -91,7 +77,11 @@ public class UsersRoutes {
         }
     }
 
-    @Operation(summary = "Get email by username", description = "Fetches the email address associated with a given username.")
+    @Operation(
+            summary = "Get email by username",
+            description = "Fetches the email address associated with a given username.",
+            tags = {"Users"}
+    )
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successfully retrieved email address",
                     content = @Content(mediaType = "application/json",
@@ -116,7 +106,11 @@ public class UsersRoutes {
         }
     }
 
-    @Operation(summary = "Get tomatoes by user UUID", description = "Fetches a list of tomatoes for a specific user by their UUID. Optionally filter by date (yyyy-MM-dd) with ?date= or by date range with ?startDate=yyyy-MM-dd&endDate=yyyy-MM-dd (both required for range)")
+    @Operation(
+            summary = "Get tomatoes by user UUID",
+            description = "Fetches a list of tomatoes for a specific user by their UUID. Optionally filter by date (yyyy-MM-dd) with ?date= or by date range with ?startDate=yyyy-MM-dd&endDate=yyyy-MM-dd (both required for range)",
+            tags = {"Users"}
+    )
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successfully retrieved tomatoes for user",
                     content = @Content(mediaType = "application/json",
@@ -147,7 +141,11 @@ public class UsersRoutes {
         }
     }
 
-    @Operation(summary = "Get activities by user UUID", description = "Fetches a list of activities for a specific user by their UUID.")
+    @Operation(
+            summary = "Get activities by user UUID",
+            description = "Fetches a list of activities for a specific user by their UUID.",
+            tags = {"Users"}
+    )
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successfully retrieved activities for user",
                     content = @Content(mediaType = "application/json",
@@ -172,7 +170,11 @@ public class UsersRoutes {
         }
     }
 
-    @Operation(summary = "Get achievements by user UUID", description = "Fetches a list of achievements for a specific user by their UUID.")
+    @Operation(
+            summary = "Get achievements by user UUID",
+            description = "Fetches a list of achievements for a specific user by their UUID.",
+            tags = {"Users"}
+    )
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successfully retrieved achievements for user",
                     content = @Content(mediaType = "application/json",
@@ -197,7 +199,11 @@ public class UsersRoutes {
         }
     }
 
-    @Operation(summary = "Get statistics by user UUID", description = "Fetches statistics for a specific user by their UUID and a date range.")
+    @Operation(
+            summary = "Get statistics by user UUID",
+            description = "Fetches statistics for a specific user by their UUID and a date range.",
+            tags = {"Users"}
+    )
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successfully retrieved statistics for user",
                     content = @Content(mediaType = "application/json",

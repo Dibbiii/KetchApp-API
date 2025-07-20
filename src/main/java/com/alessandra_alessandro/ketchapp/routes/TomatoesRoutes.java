@@ -25,7 +25,11 @@ public class TomatoesRoutes {
         this.tomatoesController = tomatoesController;
     }
 
-    @Operation(summary = "Create a new tomato record", description = "Creates a new tomato record.")
+    @Operation(
+            summary = "Create a new tomato record",
+            description = "Creates a new tomato record.",
+            tags = {"Activities"}
+    )
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "Successfully created tomato record",
                     content = @Content(mediaType = "application/json",
@@ -44,7 +48,11 @@ public class TomatoesRoutes {
         }
     }
 
-    @Operation(summary = "Get all activities for a tomato", description = "Fetches all activities related to a specific tomato by its id.")
+    @Operation(
+            summary = "Get all activities for a tomato",
+            description = "Fetches all activities related to a specific tomato by its id.",
+            tags = {"Activities"}
+    )
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successfully retrieved activities",
                     content = @Content(mediaType = "application/json",
