@@ -4,5 +4,17 @@
     "command": "./gradlew test",
     "cwd": "/Users/tacosalfornoh/Coding/Java/KetchApp-APII",
     "reveal": "always"
+  },
+
+  {
+    "label": "Build and Run KetchApp",
+    "command": "./gradlew classes && ./gradlew bootRun",
+    "cwd": "/Users/tacosalfornoh/Coding/Java/KetchApp-APII",
+    "env": {
+      "org.gradle.java.compile-classpath-packaging": "true",
+      "SPRING_OUTPUT_ANSI_ENABLED": "ALWAYS"
+    },
+    "reveal": "always",
+    "hide": "never"
   }
 ]

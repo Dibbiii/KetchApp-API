@@ -53,15 +53,15 @@ public class PlanBuilderRoutesTest {
     @Test
     void testCreatePlanBuilder() throws Exception {
         PlanBuilderResponseDto responseDto = createValidResponseDto();
-        PlanBuilderRequestDto requestDto = new PlanBuilderRequestDto(); // This is not used in mock return, but in println
+        PlanBuilderRequestDto requestDto = new PlanBuilderRequestDto();
 
         System.out.println("[TEST]: Executing testCreatePlanBuilder...");
         System.out.println(
-            "[TEST]: Request DTO for mocking (from PlanBuilderRequestDto): " + // Clarified message
+            "[TEST]: Request DTO for mocking (from PlanBuilderRequestDto): " +
             objectMapper.writeValueAsString(requestDto)
         );
         System.out.println(
-            "[TEST]: Response DTO for request body (from PlanBuilderResponseDto): " + // Clarified message
+            "[TEST]: Response DTO for request body (from PlanBuilderResponseDto): " +
             objectMapper.writeValueAsString(responseDto)
         );
 
@@ -91,7 +91,7 @@ public class PlanBuilderRoutesTest {
             argumentCaptor.capture()
         );
         System.out.println(
-            "[TEST]: Captured DTO by ArgumentCaptor (passed to controller): " + // Clarified message
+            "[TEST]: Captured DTO by ArgumentCaptor (passed to controller): " +
             objectMapper.writeValueAsString(argumentCaptor.getValue())
         );
         assertEquals(
