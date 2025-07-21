@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/activities")
 public class ActivitiesRoutes {
+
     private final ActivitiesControllers activitiesController;
 
     @Autowired
@@ -23,27 +24,48 @@ public class ActivitiesRoutes {
     }
 
     @Operation(
-            summary = "Create a new activity",
-            description = "Creates a new activity record.",
-            tags = {"Activities"}
+        summary = "Create a new activity",
+        description = "Creates a new activity record.",
+        tags = { "Activities" }
     )
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "201", description = "Successfully created achievement record",
-                    content = @Content(mediaType = "application/json",
-                            schema = @Schema(implementation = ActivityDto.class))),
+    @ApiResponses(
+        value = {
+            @ApiResponse(
+                responseCode = "201",
+                description = "Successfully created achievement record",
+                content = @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = ActivityDto.class)
+                )
+            ),
             @ApiResponse(responseCode = "400", description = "Bad request"),
-            @ApiResponse(responseCode = "401", description = "Unauthorized (authentication required)"),
-            @ApiResponse(responseCode = "500", description = "Internal server error")
-    })
+            @ApiResponse(
+                responseCode = "401",
+                description = "Unauthorized (authentication required)"
+            ),
+            @ApiResponse(
+                responseCode = "500",
+                description = "Internal server error"
+            ),
+        }
+    )
     @PostMapping
-    public ResponseEntity<ActivityDto> createActivity(@RequestBody ActivityDto activityDtoToCreate) {
+    public ResponseEntity<ActivityDto> createActivity(
+        @RequestBody ActivityDto activityDtoToCreate
+    ) {
         try {
-            ActivityDto createdActivity = activitiesController.createActivity(activityDtoToCreate);
-            return ResponseEntity.status(HttpStatus.CREATED).body(createdActivity);
+            ActivityDto createdActivity = activitiesController.createActivity(
+                activityDtoToCreate
+            );
+            return ResponseEntity.status(HttpStatus.CREATED).body(
+                createdActivity
+            );
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().build();
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+            return ResponseEntity.status(
+                HttpStatus.INTERNAL_SERVER_ERROR
+            ).build();
         }
     }
 }

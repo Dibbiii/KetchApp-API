@@ -1,0 +1,8 @@
+[
+  {
+    "label": "Run Tests",
+    "command": "./gradlew test",
+    "cwd": "/Users/tacosalfornoh/Coding/Java/KetchApp-APII",
+    "reveal": "always"
+  }
+]
