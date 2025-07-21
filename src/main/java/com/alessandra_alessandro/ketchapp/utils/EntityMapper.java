@@ -1,12 +1,15 @@
 package com.alessandra_alessandro.ketchapp.utils;
 
-import com.alessandra_alessandro.ketchapp.models.dto.*;
-import com.alessandra_alessandro.ketchapp.models.entity.*;
+import com.alessandra_alessandro.ketchapp.models.dto.ActivityDto;
+import com.alessandra_alessandro.ketchapp.models.dto.TomatoDto;
+import com.alessandra_alessandro.ketchapp.models.dto.UserDto;
+import com.alessandra_alessandro.ketchapp.models.entity.ActivityEntity;
+import com.alessandra_alessandro.ketchapp.models.entity.TomatoEntity;
+import com.alessandra_alessandro.ketchapp.models.entity.UserEntity;
 import org.mapstruct.Mapper;
 
 @Mapper(componentModel = "spring")
 public interface EntityMapper {
-
     // Activity
 
     /**
@@ -61,4 +64,3 @@ public interface EntityMapper {
      */
     UserEntity userDtoToEntity(UserDto dto);
 }
-
