@@ -1,5 +1,6 @@
 package com.alessandra_alessandro.ketchapp.controllers;
 
+import com.alessandra_alessandro.ketchapp.kafka.KafkaProducer;
 import com.alessandra_alessandro.ketchapp.models.dto.PlanBuilderRequestDto;
 import com.alessandra_alessandro.ketchapp.models.dto.PlanBuilderResponseDto;
 import com.alessandra_alessandro.ketchapp.models.dto.TomatoDto;
@@ -9,6 +10,7 @@ import com.alessandra_alessandro.ketchapp.repositories.TomatoesRepository;
 import com.alessandra_alessandro.ketchapp.repositories.UsersRepository;
 import com.alessandra_alessandro.ketchapp.utils.EntityMapper;
 import com.alessandra_alessandro.ketchapp.utils.GeminiApi;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import jakarta.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.net.URI;
@@ -35,18 +37,21 @@ public class PlanBuilderControllers {
     private final UsersRepository usersRepository;
     private final GeminiApi geminiApi;
     private final EntityMapper entityMapper;
+    private final KafkaProducer kafkaProducer;
 
     @Autowired
     public PlanBuilderControllers(
         TomatoesRepository tomatoesRepository,
         UsersRepository usersRepository,
         GeminiApi geminiApi,
-        EntityMapper entityMapper
+        EntityMapper entityMapper,
+        KafkaProducer kafkaProducer
     ) {
         this.tomatoesRepository = tomatoesRepository;
         this.usersRepository = usersRepository;
         this.geminiApi = geminiApi;
         this.entityMapper = entityMapper;
+        this.kafkaProducer = kafkaProducer;
     }
 
     /**
@@ -56,6 +61,7 @@ public class PlanBuilderControllers {
      *
      * @param dto DTO containing information for plan creation
      * @return ResponseEntity with the generated request DTO or error in case of failure
+     * @throws JsonProcessingException
      */
     public ResponseEntity<PlanBuilderRequestDto> createPlanBuilder(
         PlanBuilderResponseDto dto
@@ -70,7 +76,7 @@ public class PlanBuilderControllers {
 
         saveTomatoesFromGeminiResponse(dto, geminiResponse);
         String userEmail = resolveUserEmail(dto.getUserId());
-        sendEmailNotification(userEmail, geminiResponse);
+        kafkaProducer.sendToKafka(userEmail, geminiResponse);
         return ResponseEntity.ok(geminiResponse);
     }
 
