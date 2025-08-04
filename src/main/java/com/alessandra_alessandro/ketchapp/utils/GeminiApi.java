@@ -1,5 +1,6 @@
 package com.alessandra_alessandro.ketchapp.utils;
 
+import com.alessandra_alessandro.ketchapp.models.Schema;
 import com.alessandra_alessandro.ketchapp.models.dto.PlanBuilderRequestDto;
 import com.alessandra_alessandro.ketchapp.models.dto.PlanBuilderResponseDto;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -7,26 +8,23 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.LocalDate;
-
-import com.alessandra_alessandro.ketchapp.models.Schema;
-
-import java.util.HashMap;
 import java.util.Arrays;
+import java.util.HashMap;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
 @Component
 public class GeminiApi {
-    public static final String BASE_URL = "https://generativelanguage.googleapis.com/v1beta/models/";
+
+    public static final String BASE_URL =
+        "https://generativelanguage.googleapis.com/v1beta/models/";
     private final String apiKey;
     public static final String MODEL = "gemini-2.5-flash";
     private final String endpoint;
@@ -50,7 +48,9 @@ public class GeminiApi {
     public PlanBuilderRequestDto ask(PlanBuilderResponseDto dto) {
         assert dto != null : "Request DTO cannot be null";
         if (apiKey == null || apiKey.isEmpty()) {
-            log.error("Error: GEMINI_API_KEY property not set in application.properties.");
+            log.error(
+                "Error: GEMINI_API_KEY property not set in application.properties."
+            );
             return null;
         }
         log.debug("Received PlanBuilderResponseDto: {}", dto);
@@ -67,11 +67,24 @@ public class GeminiApi {
             String jsonPayload = buildGeminiPayload(dtoJson, question);
             log.debug("Built Gemini API payload: {}", jsonPayload);
             HttpRequest request = buildHttpRequest(jsonPayload);
-            log.debug("Sending HTTP request to Gemini API endpoint: {}", endpoint);
-            HttpResponse<String> response = HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
-            log.debug("Received response from Gemini API: status={}, body={}", response.statusCode(), response.body());
+            log.debug(
+                "Sending HTTP request to Gemini API endpoint: {}",
+                endpoint
+            );
+            HttpResponse<String> response = HTTP_CLIENT.send(
+                request,
+                HttpResponse.BodyHandlers.ofString()
+            );
+            log.debug(
+                "Received response from Gemini API: status={}, body={}",
+                response.statusCode(),
+                response.body()
+            );
             if (response.statusCode() != 200) {
-                log.error("Error: Gemini API returned status code {}", response.statusCode());
+                log.error(
+                    "Error: Gemini API returned status code {}",
+                    response.statusCode()
+                );
                 return null;
             }
             return extractDtoFromGeminiResponse(response.body());
@@ -112,28 +125,37 @@ public class GeminiApi {
      * @param dto     the PlanBuilderResponseDto containing subjects and other info
      * @return a formatted question string for the Gemini API
      */
-    private static String buildQuestion(String session, String pause, PlanBuilderResponseDto dto) {
+    private static String buildQuestion(
+        String session,
+        String pause,
+        PlanBuilderResponseDto dto
+    ) {
         StringBuilder subjectsInfo = new StringBuilder();
         if (dto.getSubjects() != null && !dto.getSubjects().isEmpty()) {
             subjectsInfo.append("Subjects to study:\n");
             for (var subject : dto.getSubjects()) {
-                subjectsInfo.append("- ")
-                        .append(subject.getName())
-                        .append("\n");
+                subjectsInfo
+                    .append("- ")
+                    .append(subject.getName())
+                    .append("\n");
             }
         }
-        return String.format("""
-                        Today's date is %s.
-                        Look at the events you have in your calendar and, based on those, create a study plan for me that allows me to study without overlapping with my scheduled commitments.
-                        
-                        Subjects to study: %s
-                        Each study session lasts %s and the break is %s.
-                        Leave a margin of 30 minutes before and after each calendar event.
-                        Remember that Start_at, End_at, and Pause_end_at are in ISO 8601 format (YYYY-MM-DDTHH:MM:SSZ).""",
-                LocalDate.now(),
-                subjectsInfo,
-                session,
-                pause);
+        return String.format(
+            """
+            Today's date is %s.
+            Look at the events you have in your calendar and, based on those, create a study plan for me that allows me to study without overlapping with my scheduled commitments.
+
+            Subjects to study: %s
+            Each study session lasts %s and the break is %s.
+            Leave a margin of 30 minutes before and after each calendar event.
+            Remember that Start_at, End_at, and Pause_end_at are in ISO 8601 format (YYYY-MM-DDTHH:MM:SSZ).
+            IMPORTANT Ensure that all study sessions (tomatoes) are scheduled exclusively for future times.
+            """,
+            LocalDate.now(),
+            subjectsInfo,
+            session,
+            pause
+        );
     }
 
     /**
@@ -146,7 +168,8 @@ public class GeminiApi {
      * @return the complete JSON payload as a string
      * @throws JsonProcessingException if serialization fails
      */
-    private static String buildGeminiPayload(String dtoJson, String question) throws JsonProcessingException {
+    private static String buildGeminiPayload(String dtoJson, String question)
+        throws JsonProcessingException {
         ObjectNode payload = OBJECT_MAPPER.createObjectNode();
         ArrayNode contentsArray = OBJECT_MAPPER.createArrayNode();
         ObjectNode contentNode = OBJECT_MAPPER.createObjectNode();
@@ -162,7 +185,10 @@ public class GeminiApi {
         ObjectNode generationConfig = OBJECT_MAPPER.createObjectNode();
         generationConfig.put("responseMimeType", "application/json");
         generationConfig.put("temperature", 1);
-        generationConfig.set("responseSchema", OBJECT_MAPPER.valueToTree(buildResponseSchema()));
+        generationConfig.set(
+            "responseSchema",
+            OBJECT_MAPPER.valueToTree(buildResponseSchema())
+        );
 
         payload.set("contents", contentsArray);
         payload.set("generationConfig", generationConfig);
@@ -181,23 +207,41 @@ public class GeminiApi {
         calendarItemProps.put("title", new Schema.PropertySchema("string"));
         calendarItemProps.put("start_at", new Schema.PropertySchema("string"));
         calendarItemProps.put("end_at", new Schema.PropertySchema("string"));
-        Schema.ObjectSchema calendarItemSchema = new Schema.ObjectSchema(calendarItemProps, Arrays.asList("title", "start_at", "end_at"));
+        Schema.ObjectSchema calendarItemSchema = new Schema.ObjectSchema(
+            calendarItemProps,
+            Arrays.asList("title", "start_at", "end_at")
+        );
 
         HashMap<String, Object> tomatoItemProps = new HashMap<>();
         tomatoItemProps.put("start_at", new Schema.PropertySchema("string"));
         tomatoItemProps.put("end_at", new Schema.PropertySchema("string"));
-        tomatoItemProps.put("pause_end_at", new Schema.PropertySchema("string"));
-        Schema.ObjectSchema tomatoItemSchema = new Schema.ObjectSchema(tomatoItemProps, Arrays.asList("start_at", "end_at", "pause_end_at"));
+        tomatoItemProps.put(
+            "pause_end_at",
+            new Schema.PropertySchema("string")
+        );
+        Schema.ObjectSchema tomatoItemSchema = new Schema.ObjectSchema(
+            tomatoItemProps,
+            Arrays.asList("start_at", "end_at", "pause_end_at")
+        );
 
         HashMap<String, Object> subjectItemProps = new HashMap<>();
         subjectItemProps.put("name", new Schema.PropertySchema("string"));
-        subjectItemProps.put("tomatoes", new Schema.ArraySchema(tomatoItemSchema));
-        Schema.ObjectSchema subjectItemSchema = new Schema.ObjectSchema(subjectItemProps, Arrays.asList("name", "tomatoes"));
+        subjectItemProps.put(
+            "tomatoes",
+            new Schema.ArraySchema(tomatoItemSchema)
+        );
+        Schema.ObjectSchema subjectItemSchema = new Schema.ObjectSchema(
+            subjectItemProps,
+            Arrays.asList("name", "tomatoes")
+        );
 
         HashMap<String, Object> mainProps = new HashMap<>();
         mainProps.put("calendar", new Schema.ArraySchema(calendarItemSchema));
         mainProps.put("subjects", new Schema.ArraySchema(subjectItemSchema));
-        return new Schema.ObjectSchema(mainProps, Arrays.asList("calendar", "subjects"));
+        return new Schema.ObjectSchema(
+            mainProps,
+            Arrays.asList("calendar", "subjects")
+        );
     }
 
     /**
@@ -208,10 +252,10 @@ public class GeminiApi {
      */
     private HttpRequest buildHttpRequest(String jsonPayload) {
         return HttpRequest.newBuilder()
-                .uri(URI.create(endpoint))
-                .header("Content-Type", "application/json")
-                .POST(HttpRequest.BodyPublishers.ofString(jsonPayload))
-                .build();
+            .uri(URI.create(endpoint))
+            .header("Content-Type", "application/json")
+            .POST(HttpRequest.BodyPublishers.ofString(jsonPayload))
+            .build();
     }
 
     /**
@@ -221,18 +265,29 @@ public class GeminiApi {
      * @param responseBody the raw JSON response from the Gemini API
      * @return the extracted PlanBuilderRequestDto, or null if extraction fails
      */
-    private static PlanBuilderRequestDto extractDtoFromGeminiResponse(String responseBody) {
+    private static PlanBuilderRequestDto extractDtoFromGeminiResponse(
+        String responseBody
+    ) {
         try {
             JsonNode root = OBJECT_MAPPER.readTree(responseBody);
             JsonNode candidates = root.path("candidates");
             if (candidates.isArray() && !candidates.isEmpty()) {
-                JsonNode parts = candidates.get(0).path("content").path("parts");
+                JsonNode parts = candidates
+                    .get(0)
+                    .path("content")
+                    .path("parts");
                 if (parts.isArray() && !parts.isEmpty()) {
                     String jsonText = parts.get(0).path("text").asText();
-                    return OBJECT_MAPPER.readValue(jsonText, PlanBuilderRequestDto.class);
+                    return OBJECT_MAPPER.readValue(
+                        jsonText,
+                        PlanBuilderRequestDto.class
+                    );
                 }
             }
-            log.error("Could not extract DTO from Gemini API response: {}", responseBody);
+            log.error(
+                "Could not extract DTO from Gemini API response: {}",
+                responseBody
+            );
         } catch (Exception e) {
             log.error("Error parsing Gemini API response: {}", e.getMessage());
         }
