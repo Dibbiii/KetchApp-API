@@ -1,5 +1,7 @@
 package com.alessandra_alessandro.ketchapp;
 
+import static org.mockito.Mockito.*;
+
 import com.alessandra_alessandro.ketchapp.kafka.KafkaProducer;
 import com.alessandra_alessandro.ketchapp.models.dto.PlanBuilderRequestDto;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -10,8 +12,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.*;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.kafka.core.KafkaTemplate;
-
-import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 public class KafkaProducerTest {
@@ -27,9 +27,9 @@ public class KafkaProducerTest {
 
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.openMocks(this);
         try {
-            java.lang.reflect.Field topicField = KafkaProducer.class.getDeclaredField("mailServiceTopic");
+            java.lang.reflect.Field topicField =
+                KafkaProducer.class.getDeclaredField("mailServiceTopic");
             topicField.setAccessible(true);
             topicField.set(kafkaProducer, "test-topic");
         } catch (Exception e) {
@@ -46,7 +46,11 @@ public class KafkaProducerTest {
 
         kafkaProducer.sendToKafka(email, plan);
 
-        String expectedMessage = String.format("EMAIL:%s|DATA:%s", email, planJson);
+        String expectedMessage = String.format(
+            "EMAIL:%s|DATA:%s",
+            email,
+            planJson
+        );
         verify(kafkaTemplate).send("test-topic", expectedMessage);
     }
 
@@ -54,8 +58,9 @@ public class KafkaProducerTest {
     void testSendToKafkaJsonProcessingException() throws Exception {
         String email = "test@example.com";
         PlanBuilderRequestDto plan = new PlanBuilderRequestDto();
-        lenient().when(objectMapper.writeValueAsString(plan)).thenThrow(new JsonProcessingException("error") {
-        });
+        lenient()
+            .when(objectMapper.writeValueAsString(plan))
+            .thenThrow(new JsonProcessingException("error") {});
         kafkaProducer.sendToKafka(email, plan);
         verify(kafkaTemplate, never()).send(anyString(), anyString());
     }
@@ -69,10 +74,13 @@ public class KafkaProducerTest {
 
         kafkaProducer.sendToKafka(email, plan);
 
-        String expectedMessage = String.format("EMAIL:%s|DATA:%s", email, planJson);
+        String expectedMessage = String.format(
+            "EMAIL:%s|DATA:%s",
+            email,
+            planJson
+        );
         verify(kafkaTemplate).send("test-topic", expectedMessage);
     }
-
 
     @Test
     void testSendToKafkaWithNullPlan() throws Exception {
@@ -81,7 +89,11 @@ public class KafkaProducerTest {
         String planJson = "null";
         when(objectMapper.writeValueAsString(plan)).thenReturn(planJson);
         kafkaProducer.sendToKafka(email, plan);
-        String expectedMessage = String.format("EMAIL:%s|DATA:%s", email, planJson);
+        String expectedMessage = String.format(
+            "EMAIL:%s|DATA:%s",
+            email,
+            planJson
+        );
         verify(kafkaTemplate).send("test-topic", expectedMessage);
     }
 
@@ -94,7 +106,11 @@ public class KafkaProducerTest {
 
         kafkaProducer.sendToKafka(email, plan);
 
-        String expectedMessage = String.format("EMAIL:%s|DATA:%s", email, planJson);
+        String expectedMessage = String.format(
+            "EMAIL:%s|DATA:%s",
+            email,
+            planJson
+        );
         verify(kafkaTemplate).send("test-topic", expectedMessage);
     }
 
@@ -107,7 +123,11 @@ public class KafkaProducerTest {
 
         kafkaProducer.sendToKafka(email, plan);
 
-        String expectedMessage = String.format("EMAIL:%s|DATA:%s", email, planJson);
+        String expectedMessage = String.format(
+            "EMAIL:%s|DATA:%s",
+            email,
+            planJson
+        );
         verify(kafkaTemplate).send("test-topic", expectedMessage);
     }
 
@@ -120,7 +140,11 @@ public class KafkaProducerTest {
 
         kafkaProducer.sendToKafka(email, plan);
 
-        String expectedMessage = String.format("EMAIL:%s|DATA:%s", email, planJson);
+        String expectedMessage = String.format(
+            "EMAIL:%s|DATA:%s",
+            email,
+            planJson
+        );
         verify(kafkaTemplate).send("test-topic", expectedMessage);
     }
 }
