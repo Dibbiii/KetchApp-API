@@ -46,5 +46,18 @@
     "shell": "system",
     // Represents the tags for inline runnable indicators, or spawning multiple tasks at once.
     "tags": []
+  },
+  {
+    "label": "Test Tomatoes Integration",
+    "command": "bash gradlew test --tests '*TomatoesRestControllerIntegrationTest*'",
+    "cwd": "KetchApp-App-Api",
+    "env": {},
+    "use_new_terminal": false,
+    "allow_concurrent_runs": false,
+    "reveal": "always",
+    "reveal_target": "dock",
+    "hide": "never",
+    "shell": "system",
+    "tags": []
   }
 ]
