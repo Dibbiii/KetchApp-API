@@ -80,7 +80,7 @@ public class TomatoesControllers {
         log.info("Mapped activities to ActivityDto list: {}", result);
         return result;
     }
-
+  
     public TomatoDto getTomato(Integer id) {
         log.info("Fetching TomatoDto by ID: {}", id);
         TomatoEntity tomatoEntity = tomatoesRepository.findById(id);
