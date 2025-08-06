@@ -7,22 +7,28 @@ import com.alessandra_alessandro.ketchapp.models.entity.TomatoEntity;
 import com.alessandra_alessandro.ketchapp.repositories.ActivitiesRepository;
 import com.alessandra_alessandro.ketchapp.repositories.TomatoesRepository;
 import com.alessandra_alessandro.ketchapp.utils.EntityMapper;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
+import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.List;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 @Service
 public class TomatoesControllers {
-    private static final Logger log = LoggerFactory.getLogger(TomatoesControllers.class);
+
+    private static final Logger log = LoggerFactory.getLogger(
+        TomatoesControllers.class
+    );
     final TomatoesRepository tomatoesRepository;
     private final ActivitiesRepository activitiesRepository;
     private final EntityMapper entityMapper;
 
     @Autowired
-    public TomatoesControllers(TomatoesRepository tomatoesRepository, ActivitiesRepository activitiesRepository, EntityMapper entityMapper) {
+    public TomatoesControllers(
+        TomatoesRepository tomatoesRepository,
+        ActivitiesRepository activitiesRepository,
+        EntityMapper entityMapper
+    ) {
         this.tomatoesRepository = tomatoesRepository;
         this.activitiesRepository = activitiesRepository;
         this.entityMapper = entityMapper;
@@ -59,12 +65,27 @@ public class TomatoesControllers {
      */
     public List<ActivityDto> getActivitiesByTomatoId(Integer tomatoId) {
         log.info("Fetching activities for tomatoId: {}", tomatoId);
-        List<ActivityEntity> activities = activitiesRepository.findByTomatoId(tomatoId);
-        log.info("Found {} activities for tomatoId {}", activities.size(), tomatoId);
-        List<ActivityDto> result = activities.stream()
-                .map(entityMapper::activityEntityToDto)
-                .collect(java.util.stream.Collectors.toList());
+        List<ActivityEntity> activities = activitiesRepository.findByTomatoId(
+            tomatoId
+        );
+        log.info(
+            "Found {} activities for tomatoId {}",
+            activities.size(),
+            tomatoId
+        );
+        List<ActivityDto> result = activities
+            .stream()
+            .map(entityMapper::activityEntityToDto)
+            .collect(java.util.stream.Collectors.toList());
         log.info("Mapped activities to ActivityDto list: {}", result);
+        return result;
+    }
+
+    public TomatoDto getTomato(Integer id) {
+        log.info("Fetching TomatoDto by ID: {}", id);
+        TomatoEntity tomatoEntity = tomatoesRepository.findById(id);
+        TomatoDto result = entityMapper.tomatoEntityToDto(tomatoEntity);
+        log.info("Converted TomatoEntity to TomatoDto: {}", result);
         return result;
     }
 }
