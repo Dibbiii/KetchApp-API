@@ -41,22 +41,22 @@ public class UsersControllers {
     /**
      * Returns a list of the top 100 users ordered by total hours.
      *
-     * @return a list of UserDto representing the users with their total hours
+     * @return a list of UsersDto representing the users with their total hours
      */
-    public List<UserDto> getUsers() {
+    public List<UsersDto> getUsers() {
         log.info("Fetching top 100 users by total hours");
         List<Object[]> results = usersRepository.findTop100UsersByTotalHours();
-        List<UserDto> users = new ArrayList<>();
+        List<UsersDto> users = new ArrayList<>();
         for (Object[] row : results) {
-            UserDto userDto = new UserDto();
-            userDto.setId(
+            UsersDto usersDto = new UsersDto();
+            usersDto.setId(
                 row[0] != null ? UUID.fromString(row[0].toString()) : null
             );
-            userDto.setUsername(row[1] != null ? row[1].toString() : null);
-            userDto.setTotalHours(
+            usersDto.setUsername(row[1] != null ? row[1].toString() : null);
+            usersDto.setTotalHours(
                 row[2] != null ? ((Number) row[2]).doubleValue() : 0.0
             );
-            users.add(userDto);
+            users.add(usersDto);
         }
         log.info("Returning {} users", users.size());
         return users;
@@ -295,14 +295,14 @@ public class UsersControllers {
             .stream()
             .filter(a -> "Studied for 5 hours".equals(a.getDescription()))
             .findFirst();
-        boolean studiedCompleted = totalHours >= 5.0;
+        boolean studiedCompleted = totalHours >= 1.0;
         AchievementEntity studiedEntity = studiedAchievement.orElseGet(() ->
-            new AchievementEntity(uuid, "Studied for 5 hours", studiedCompleted)
+            new AchievementEntity(uuid, "Studied for 1 hours", studiedCompleted)
         );
         studiedEntity.setCompleted(studiedCompleted);
         achievementsRepository.save(studiedEntity);
         log.info(
-            "Updated/created 'Studied for 5 hours' achievement for user {}: completed={}",
+            "Updated/created 'Studied for 1 hours' achievement for user {}: completed={}",
             uuid,
             studiedCompleted
         );

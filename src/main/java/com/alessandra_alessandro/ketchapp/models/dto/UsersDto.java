@@ -10,9 +10,9 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserDto {
+public class UsersDto {
 
     private UUID id;
     private String username;
-    private String email;
+    private Double totalHours;
 }
