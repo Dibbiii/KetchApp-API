@@ -1,4 +1,3 @@
-version: "3.8"
 services:
   ketchapp-api:
     build: .
@@ -6,3 +5,9 @@ services:
       - "8081:8081"
     environment:
       - GEMINI_API_KEY=AIzaSyCkkuxXPPoohG40PbiIFECLbr7sjAqo-a0
+    networks:
+      - ketchapp-net
+
+networks:
+  ketchapp-net:
+    external: true
