@@ -1,18 +1,17 @@
 package com.alessandra_alessandro.ketchapp.models.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
-import jakarta.persistence.Id;
 import jakarta.persistence.Column;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.NoArgsConstructor;
-import lombok.AllArgsConstructor;
-import org.apache.catalina.User;
-
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.UUID;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import org.apache.catalina.User;
 
 @Entity
 @Table(name = "users")
@@ -40,5 +39,11 @@ public class UserEntity {
     public UserEntity(UUID uuid, String username) {
         this.id = uuid;
         this.username = username;
+    }
+
+    public UserEntity(UUID uuid, String username, String email) {
+        this.id = uuid;
+        this.username = username;
+        this.email = email;
     }
 }

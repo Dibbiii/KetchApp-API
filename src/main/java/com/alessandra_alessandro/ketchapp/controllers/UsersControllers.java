@@ -5,9 +5,6 @@ import com.alessandra_alessandro.ketchapp.models.entity.*;
 import com.alessandra_alessandro.ketchapp.repositories.AchievementsRepository;
 import com.alessandra_alessandro.ketchapp.repositories.UsersRepository;
 import com.alessandra_alessandro.ketchapp.utils.EntityMapper;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -16,17 +13,26 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 @Service
 public class UsersControllers {
-    private static final Logger log = LoggerFactory.getLogger(UsersControllers.class);
+
+    private static final Logger log = LoggerFactory.getLogger(
+        UsersControllers.class
+    );
 
     private final UsersRepository usersRepository;
     private final AchievementsRepository achievementsRepository;
     private final EntityMapper entityMapper;
 
     @Autowired
-    public UsersControllers(UsersRepository usersRepository, AchievementsRepository achievementsRepository, EntityMapper entityMapper) {
+    public UsersControllers(
+        UsersRepository usersRepository,
+        AchievementsRepository achievementsRepository,
+        EntityMapper entityMapper
+    ) {
         this.usersRepository = usersRepository;
         this.achievementsRepository = achievementsRepository;
         this.entityMapper = entityMapper;
@@ -43,9 +49,13 @@ public class UsersControllers {
         List<UserDto> users = new ArrayList<>();
         for (Object[] row : results) {
             UserDto userDto = new UserDto();
-            userDto.setId(row[0] != null ? UUID.fromString(row[0].toString()) : null);
+            userDto.setId(
+                row[0] != null ? UUID.fromString(row[0].toString()) : null
+            );
             userDto.setUsername(row[1] != null ? row[1].toString() : null);
-            userDto.setTotalHours(row[2] != null ? ((Number) row[2]).doubleValue() : 0.0);
+            userDto.setTotalHours(
+                row[2] != null ? ((Number) row[2]).doubleValue() : 0.0
+            );
             users.add(userDto);
         }
         log.info("Returning {} users", users.size());
@@ -71,7 +81,9 @@ public class UsersControllers {
             return entityMapper.userEntityToDto(entityOptional.get());
         } else {
             log.warn("User with UUID '{}' not found", id);
-            throw new IllegalArgumentException("User with UUID '" + id + "' not found.");
+            throw new IllegalArgumentException(
+                "User with UUID '" + id + "' not found."
+            );
         }
     }
 
@@ -86,15 +98,25 @@ public class UsersControllers {
         log.info("Fetching email for username: {}", username);
         if (username == null || username.isEmpty()) {
             log.error("Username cannot be null or empty");
-            throw new IllegalArgumentException("Username cannot be null or empty");
+            throw new IllegalArgumentException(
+                "Username cannot be null or empty"
+            );
         }
-        Optional<UserEntity> entityOptional = usersRepository.findByUsername(username);
+        Optional<UserEntity> entityOptional = usersRepository.findByUsername(
+            username
+        );
         if (entityOptional.isPresent()) {
-            log.info("Email found for username {}: {}", username, entityOptional.get().getEmail());
+            log.info(
+                "Email found for username {}: {}",
+                username,
+                entityOptional.get().getEmail()
+            );
             return entityOptional.get().getEmail();
         } else {
             log.warn("User with username '{}' not found", username);
-            throw new IllegalArgumentException("User with username '" + username + "' not found.");
+            throw new IllegalArgumentException(
+                "User with username '" + username + "' not found."
+            );
         }
     }
 
@@ -113,9 +135,10 @@ public class UsersControllers {
         }
         List<TomatoEntity> tomatoes = usersRepository.findTomatoesByUuid(uuid);
         log.info("Found {} tomatoes for user UUID {}", tomatoes.size(), uuid);
-        return tomatoes.stream()
-                .map(entityMapper::tomatoEntityToDto)
-                .collect(Collectors.toList());
+        return tomatoes
+            .stream()
+            .map(entityMapper::tomatoEntityToDto)
+            .collect(Collectors.toList());
     }
 
     /**
@@ -128,17 +151,35 @@ public class UsersControllers {
      * @throws IllegalArgumentException if the UUID is null
      */
     public List<TomatoDto> getUserTomatoes(UUID uuid, LocalDate date) {
-        log.info("Fetching tomatoes for user UUID: {} from date: {}", uuid, date);
+        log.info(
+            "Fetching tomatoes for user UUID: {} from date: {}",
+            uuid,
+            date
+        );
         if (uuid == null) {
             log.error("UUID cannot be null");
             throw new IllegalArgumentException("UUID cannot be null");
         }
         List<TomatoEntity> tomatoes = usersRepository.findTomatoesByUuid(uuid);
-        List<TomatoDto> filtered = tomatoes.stream()
-                .filter(tomato -> date == null || !tomato.getCreatedAt().toLocalDateTime().toLocalDate().isBefore(date))
-                .map(entityMapper::tomatoEntityToDto)
-                .collect(Collectors.toList());
-        log.info("Found {} tomatoes for user UUID {} from date {}", filtered.size(), uuid, date);
+        List<TomatoDto> filtered = tomatoes
+            .stream()
+            .filter(
+                tomato ->
+                    date == null ||
+                    !tomato
+                        .getCreatedAt()
+                        .toLocalDateTime()
+                        .toLocalDate()
+                        .isBefore(date)
+            )
+            .map(entityMapper::tomatoEntityToDto)
+            .collect(Collectors.toList());
+        log.info(
+            "Found {} tomatoes for user UUID {} from date {}",
+            filtered.size(),
+            uuid,
+            date
+        );
         return filtered;
     }
 
@@ -152,26 +193,51 @@ public class UsersControllers {
      * @return list of TomatoDto related to the user and filtered by date range
      * @throws IllegalArgumentException if the UUID, startDate, or endDate are null
      */
-    public List<TomatoDto> getUserTomatoes(UUID uuid, LocalDate startDate, LocalDate endDate) {
-        log.info("Fetching tomatoes for user UUID: {} from {} to {}", uuid, startDate, endDate);
+    public List<TomatoDto> getUserTomatoes(
+        UUID uuid,
+        LocalDate startDate,
+        LocalDate endDate
+    ) {
+        log.info(
+            "Fetching tomatoes for user UUID: {} from {} to {}",
+            uuid,
+            startDate,
+            endDate
+        );
         if (uuid == null) {
             log.error("UUID cannot be null");
             throw new IllegalArgumentException("UUID cannot be null");
         }
         if (startDate == null || endDate == null) {
             log.error("Both startDate and endDate must be provided");
-            throw new IllegalArgumentException("Both startDate and endDate must be provided");
+            throw new IllegalArgumentException(
+                "Both startDate and endDate must be provided"
+            );
         }
         List<TomatoEntity> tomatoes = usersRepository.findTomatoesByUuid(uuid);
-        List<TomatoDto> filtered = tomatoes.stream()
-                .filter(tomato -> {
-                    LocalDate tomatoDate = tomato.getCreatedAt().toLocalDateTime().toLocalDate();
-                    return (tomatoDate.isEqual(startDate) || tomatoDate.isAfter(startDate)) &&
-                            (tomatoDate.isEqual(endDate) || tomatoDate.isBefore(endDate));
-                })
-                .map(entityMapper::tomatoEntityToDto)
-                .collect(Collectors.toList());
-        log.info("Found {} tomatoes for user UUID {} from {} to {}", filtered.size(), uuid, startDate, endDate);
+        List<TomatoDto> filtered = tomatoes
+            .stream()
+            .filter(tomato -> {
+                LocalDate tomatoDate = tomato
+                    .getCreatedAt()
+                    .toLocalDateTime()
+                    .toLocalDate();
+                return (
+                    (tomatoDate.isEqual(startDate) ||
+                        tomatoDate.isAfter(startDate)) &&
+                    (tomatoDate.isEqual(endDate) ||
+                        tomatoDate.isBefore(endDate))
+                );
+            })
+            .map(entityMapper::tomatoEntityToDto)
+            .collect(Collectors.toList());
+        log.info(
+            "Found {} tomatoes for user UUID {} from {} to {}",
+            filtered.size(),
+            uuid,
+            startDate,
+            endDate
+        );
         return filtered;
     }
 
@@ -188,11 +254,18 @@ public class UsersControllers {
             log.error("UUID cannot be null");
             throw new IllegalArgumentException("UUID cannot be null");
         }
-        List<ActivityEntity> activities = usersRepository.findActivitiesByUuid(uuid);
-        log.info("Found {} activities for user UUID {}", activities.size(), uuid);
-        return activities.stream()
-                .map(entityMapper::activityEntityToDto)
-                .collect(Collectors.toList());
+        List<ActivityEntity> activities = usersRepository.findActivitiesByUuid(
+            uuid
+        );
+        log.info(
+            "Found {} activities for user UUID {}",
+            activities.size(),
+            uuid
+        );
+        return activities
+            .stream()
+            .map(entityMapper::activityEntityToDto)
+            .collect(Collectors.toList());
     }
 
     /**
@@ -217,33 +290,66 @@ public class UsersControllers {
         Double totalHours = usersRepository.findTotalHoursByUserUUID(uuid);
         if (totalHours == null) totalHours = 0.0;
         log.info("Total hours for user {}: {}", uuid, totalHours);
-        Optional<AchievementEntity> studiedAchievement = usersRepository.findAchievementsByUuid(uuid).stream()
-                .filter(a -> "Studied for 5 hours".equals(a.getDescription())).findFirst();
+        Optional<AchievementEntity> studiedAchievement = usersRepository
+            .findAchievementsByUuid(uuid)
+            .stream()
+            .filter(a -> "Studied for 5 hours".equals(a.getDescription()))
+            .findFirst();
         boolean studiedCompleted = totalHours >= 5.0;
-        AchievementEntity studiedEntity = studiedAchievement.orElseGet(() -> new AchievementEntity(uuid, "Studied for 5 hours", studiedCompleted));
+        AchievementEntity studiedEntity = studiedAchievement.orElseGet(() ->
+            new AchievementEntity(uuid, "Studied for 5 hours", studiedCompleted)
+        );
         studiedEntity.setCompleted(studiedCompleted);
         achievementsRepository.save(studiedEntity);
-        log.info("Updated/created 'Studied for 5 hours' achievement for user {}: completed={}", uuid, studiedCompleted);
-        int tomatoCount = Math.toIntExact(usersRepository.countTomatoesByUserUUID(uuid));
+        log.info(
+            "Updated/created 'Studied for 5 hours' achievement for user {}: completed={}",
+            uuid,
+            studiedCompleted
+        );
+        int tomatoCount = Math.toIntExact(
+            usersRepository.countTomatoesByUserUUID(uuid)
+        );
         log.info("Tomato count for user {}: {}", uuid, tomatoCount);
-        Optional<AchievementEntity> tomatoAchievement = usersRepository.findAchievementsByUuid(uuid).stream()
-                .filter(a -> "Completed 10 Tomatoes".equals(a.getDescription())).findFirst();
+        Optional<AchievementEntity> tomatoAchievement = usersRepository
+            .findAchievementsByUuid(uuid)
+            .stream()
+            .filter(a -> "Completed 10 Tomatoes".equals(a.getDescription()))
+            .findFirst();
         boolean tomatoCompleted = tomatoCount >= 10;
-        AchievementEntity tomatoEntity = tomatoAchievement.orElseGet(() -> new AchievementEntity(uuid, "Completed 10 Tomatoes", tomatoCompleted));
+        AchievementEntity tomatoEntity = tomatoAchievement.orElseGet(() ->
+            new AchievementEntity(
+                uuid,
+                "Completed 10 Tomatoes",
+                tomatoCompleted
+            )
+        );
         tomatoEntity.setCompleted(tomatoCompleted);
         achievementsRepository.save(tomatoEntity);
-        log.info("Updated/created 'Completed 10 Tomatoes' achievement for user {}: completed={}", uuid, tomatoCompleted);
-        List<AchievementEntity> achievements = usersRepository.findAchievementsByUuid(uuid);
+        log.info(
+            "Updated/created 'Completed 10 Tomatoes' achievement for user {}: completed={}",
+            uuid,
+            tomatoCompleted
+        );
+        List<AchievementEntity> achievements =
+            usersRepository.findAchievementsByUuid(uuid);
         if (achievements == null) return new ArrayList<>();
-        log.info("Returning {} achievements for user {}", achievements.size(), uuid);
-        return achievements.stream()
-                .map(achievementEntity -> new AchievementDto(
-                        achievementEntity.getId(),
-                        achievementEntity.getUserUUID(),
-                        achievementEntity.getDescription(),
-                        achievementEntity.getCompleted(),
-                        achievementEntity.getCreatedAt()
-                )).collect(Collectors.toList());
+        log.info(
+            "Returning {} achievements for user {}",
+            achievements.size(),
+            uuid
+        );
+        return achievements
+            .stream()
+            .map(achievementEntity ->
+                new AchievementDto(
+                    achievementEntity.getId(),
+                    achievementEntity.getUserUUID(),
+                    achievementEntity.getDescription(),
+                    achievementEntity.getCompleted(),
+                    achievementEntity.getCreatedAt()
+                )
+            )
+            .collect(Collectors.toList());
     }
 
     /**
@@ -255,19 +361,32 @@ public class UsersControllers {
      * @return a StatisticsDto object containing the user's daily and subject-specific statistics
      * @throws IllegalArgumentException if uuid, startDate, or endDate are null, or if endDate is before startDate
      */
-    public StatisticsDto getUserStatistics(UUID uuid, LocalDate startDate, LocalDate endDate) {
-        log.info("Fetching statistics for user UUID: {} from {} to {}", uuid, startDate, endDate);
+    public StatisticsDto getUserStatistics(
+        UUID uuid,
+        LocalDate startDate,
+        LocalDate endDate
+    ) {
+        log.info(
+            "Fetching statistics for user UUID: {} from {} to {}",
+            uuid,
+            startDate,
+            endDate
+        );
         if (uuid == null) {
             log.error("UUID cannot be null");
             throw new IllegalArgumentException("UUID cannot be null");
         }
         if (startDate == null || endDate == null) {
             log.error("Start date and end date cannot be null");
-            throw new IllegalArgumentException("Start date and end date cannot be null");
+            throw new IllegalArgumentException(
+                "Start date and end date cannot be null"
+            );
         }
         if (endDate.isBefore(startDate)) {
             log.error("End date cannot be before start date");
-            throw new IllegalArgumentException("End date cannot be before start date");
+            throw new IllegalArgumentException(
+                "End date cannot be before start date"
+            );
         }
         List<LocalDate> rangeDates = new ArrayList<>();
         LocalDate current = startDate;
@@ -278,22 +397,51 @@ public class UsersControllers {
         log.info("Date range for statistics: {}", rangeDates);
         List<StatisticsDateDto> statisticsDates = new ArrayList<>();
         for (LocalDate date : rangeDates) {
-            List<String> subjects = usersRepository.findSubjectsByUuidAndDate(uuid, date.toString());
+            List<String> subjects = usersRepository.findSubjectsByUuidAndDate(
+                uuid,
+                date.toString()
+            );
             log.info("Subjects for user {} on {}: {}", uuid, date, subjects);
             List<StatisticsSubjectDto> statisticsSubjects = new ArrayList<>();
             for (String subject : subjects) {
-                Double totalHours = usersRepository.findTotalHoursByUserAndSubjectAndDate(uuid, subject, date.toString());
-                log.info("Total hours for user {} on {} for subject '{}': {}", uuid, date, subject, totalHours);
-                statisticsSubjects.add(new StatisticsSubjectDto(subject, totalHours != null ? totalHours : 0.0));
-            }
-            statisticsDates.add(new StatisticsDateDto(
+                Double totalHours =
+                    usersRepository.findTotalHoursByUserAndSubjectAndDate(
+                        uuid,
+                        subject,
+                        date.toString()
+                    );
+                log.info(
+                    "Total hours for user {} on {} for subject '{}': {}",
+                    uuid,
                     date,
-                    statisticsSubjects.stream().mapToDouble(StatisticsSubjectDto::getHours).sum(),
-                    statisticsSubjects));
+                    subject,
+                    totalHours
+                );
+                statisticsSubjects.add(
+                    new StatisticsSubjectDto(
+                        subject,
+                        totalHours != null ? totalHours : 0.0
+                    )
+                );
+            }
+            statisticsDates.add(
+                new StatisticsDateDto(
+                    date,
+                    statisticsSubjects
+                        .stream()
+                        .mapToDouble(StatisticsSubjectDto::getHours)
+                        .sum(),
+                    statisticsSubjects
+                )
+            );
         }
         StatisticsDto statisticsDto = new StatisticsDto();
         statisticsDto.setDates(statisticsDates);
-        log.info("Returning statisticsDto for user {}: {}", uuid, statisticsDto);
+        log.info(
+            "Returning statisticsDto for user {}: {}",
+            uuid,
+            statisticsDto
+        );
         return statisticsDto;
     }
 
@@ -306,19 +454,32 @@ public class UsersControllers {
      */
     public NewUserDto createUser(NewUserDto newUserDto) {
         log.info("Creating user: {}", newUserDto.getUsername());
-        if (newUserDto.getUsername() == null || newUserDto.getUsername().isBlank()) {
+        if (
+            newUserDto.getUsername() == null ||
+            newUserDto.getUsername().isBlank()
+        ) {
             log.error("Username cannot be null or blank");
-            throw new IllegalArgumentException("Username cannot be null or blank");
+            throw new IllegalArgumentException(
+                "Username cannot be null or blank"
+            );
         }
-        if (usersRepository.findByUsername(newUserDto.getUsername()).isPresent()) {
+        if (
+            usersRepository.findByUsername(newUserDto.getUsername()).isPresent()
+        ) {
             log.error("Username '{}' already exists", newUserDto.getUsername());
             throw new IllegalArgumentException("Username already exists");
         }
-        UserEntity entity = new UserEntity();
-        entity.setUsername(newUserDto.getUsername());
-        entity.setEmail(newUserDto.getEmail());
+        UserEntity entity = new UserEntity(
+            newUserDto.getId(),
+            newUserDto.getUsername(),
+            newUserDto.getEmail()
+        );
         UserEntity saved = usersRepository.save(entity);
         log.info("User created with UUID: {}", saved.getId());
-        return new NewUserDto(saved.getId().toString(), saved.getUsername(), saved.getEmail());
+        return new NewUserDto(
+            saved.getId(),
+            saved.getUsername(),
+            saved.getEmail()
+        );
     }
 }
